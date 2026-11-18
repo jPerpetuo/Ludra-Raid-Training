@@ -28,7 +28,8 @@ face the boss.
 2. Four **orange lines** appear one after another, every 4 seconds, in a **fixed order**.
 3. For each line: stay **off** it while it is orange, step **onto** it once the orange finishes, and be on it when the
    rest of the arena **detonates**.
-4. Between lines, a **wall of vertical lasers** sweeps across the room; stand in a gap between beams.
+4. After each line, a **wall of vertical lasers** forms on one side of the room, then sweeps across the whole room
+   in about 2.5 seconds, still moving when the next line strikes; stand in a gap between beams.
 5. **Hard mode only:** an orange circle drops under every player's feet after each line; be outside it (or perfect
    dodge) when it finishes filling.
 
@@ -83,18 +84,28 @@ So the step-in window is **1.9 s**: from the strike to the detonation.
 - **Damage:** on hard mode a beam kills. On normal mode it kills most players, but very well geared players can survive
   (Confirmed). A trainer should treat a hit as death.
 
-### Timing and size (Estimate – not yet measured)
+### Timing (Measured, 60 fps video, 1 sweep)
+
+Frame counts by an experienced raider stepping through the video one frame at a time, plus a frame check of the
+far-wall arrival. Times are relative to the strike of the line the row belongs to; the strike in that pull was taken
+from the detonation (detonation − 1.9 s), so allow ±0.1 s.
+
+| Event | Time | Notes |
+|---|---|---|
+| Row visible on its starting wall | ~+1.25 s | ~100 frames (1.65 s) before it starts moving |
+| Row starts sweeping | ~+2.9 s | ~20 frames (0.33 s) after the hard-mode circle resolves |
+| Row reaches the far wall | ~+5.4 s | ~150 frames (2.5 s) after it starts; arrival frame-checked at 4:39.92 |
+
+So a row crosses the whole room in about **2.5 s**, at a steady speed, and is still moving when the next line
+strikes (+4.0 s). Players dodge it while leaving the old line and stepping onto the new one.
+
+### Size (Estimate)
 
 | Value | Current guess |
 |---|---|
-| Row appears on its starting wall | ~1.35 s after the strike |
-| Row waits on the wall before moving | ~1.2 s |
-| Time to cross the room, wall to wall | ~2.6 s |
-| Beams per row | 6–8 seen in video |
+| Beams per row | 8–10 seen across one wall |
 | Beam spacing | ~5 m (trainer value) |
-| Gap position | Unknown whether the centre is a beam or a gap |
-
-With these guesses, a row is still crossing when the next line strikes, so you dodge both at once.
+| Gap position | Unknown whether the room's centre is a beam or a gap |
 
 ## Hard-mode orange circle
 
@@ -136,20 +147,21 @@ Relative to the line's strike:
 
 ## One full cycle at a glance
 
-Relative to the strike (0.0 s). Laser rows are estimates; everything else is measured.
+Relative to the strike (0.0 s). All measured except where marked.
 
 ```
 -0.65  orange line appears                              (stay OFF it)
  0.00  STRIKE: orange gone, kills anyone inside it      (now step ON)
 +0.35  lightning strip shows on the line
 +0.70 .. +1.35  [hard] orange circle drops under each player
-+1.35  laser row appears on its wall                     (estimate)
++1.25  this line's laser row appears on its wall
++1.40  lines 2-4: the previous line's laser row reaches the far wall
 +1.90  DETONATION: kills anyone off the line
-+2.55  laser row starts moving                           (estimate)
 +2.55 .. +3.20  [hard] circle resolves: be out of it, or perfect dodge
++2.90  this line's laser row starts sweeping
 +3.35  next orange line appears
-+4.00  next strike
-+5.15  laser row reaches the far wall                    (estimate)
++4.00  next strike (the laser row is still crossing)
++5.40  laser row reaches the far wall
 ```
 
 ## Player-side details (for a trainer)
@@ -184,7 +196,10 @@ Relative to the strike (0.0 s). Laser rows are estimates; everything else is mea
   ],
   "laser": {
     "lethal": true,
-    "estimate": { "appearAfterStrikeSec": 1.35, "holdSec": 1.2, "crossRoomSec": 2.6, "beamsPerRow": [6, 8], "spacingMeters": 5 }
+    "appearAfterStrikeSec": 1.25,
+    "startMoveAfterStrikeSec": 2.9,
+    "crossRoomSec": 2.5,
+    "estimate": { "beamsPerRow": [8, 10], "spacingMeters": 5 }
   },
   "hardCircle": {
     "perPlayer": true,
@@ -201,7 +216,8 @@ Relative to the strike (0.0 s). Laser rows are estimates; everything else is mea
 
 ## Open questions
 
-1. **Laser wall timing** – when the row appears, how long it waits, how long it takes to cross. Next to measure.
+1. Laser timing comes from one sweep. Still open: whether the sweep start is tied to the line strike or to the
+   hard-mode circle resolving (the circle's drop time varies), and whether normal mode uses the same timing.
 2. Laser beam count, spacing, and whether the room's centre is a beam or a gap.
 3. Whether another player's hard-mode circle can kill you.
 4. Real arena size, line width and circle radius.
@@ -218,6 +234,7 @@ first and last frame each effect is visible.
 |---|---|---|
 | [Ludra Hard, Cleric POV](https://youtu.be/vOb-LqzxLsE?t=793) (from 13:05) | 30 fps | Overall sequence, line timings (lines 2 and 4) |
 | [Ludra Hard Mode clear, Templar POV](https://youtu.be/RNZA_QjX3NE?t=457) (from 7:37) | 60 fps | Hard-mode circle timings (3 circles), line 1 re-check, 4 s interval |
+| [Same video, earlier pull](https://youtu.be/RNZA_QjX3NE?t=270) (4:30–4:40) | 60 fps | Laser sweep (player frame counts + far-wall frame check), detonation times |
 
 Pitfalls when measuring:
 
@@ -225,6 +242,12 @@ Pitfalls when measuring:
 - The arena floor has **round platforms with orange rims** that look like hard-mode circles. The real circle has an
   orange shaded fill that disappears when it resolves; the platform rim stays.
 - Bright detonation and lightning flashes can hide an effect for a frame or two.
+- A laser row hitting the far wall flashes as a dense wall of beams, close in time to the next detonation, and is
+  easy to mistake for the detonation itself. Follow the row's 8–10 thick beams across the floor to be sure.
+- Don't assume where the recording player stands: they may still be on the previous line, near a wall. Time a
+  sweep from wall to wall, not from wall to player.
+- With the low third-person camera, a row moving toward the camera can look like it is standing still on the wall
+  for a second. An earlier version of this file made that mistake.
 
 ## Reference implementation
 

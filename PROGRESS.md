@@ -27,7 +27,10 @@ directory listing at `/` because the file is no longer `index.html`; rename or a
   orange gone at 0.65 s, lightning strip at 1.00 s, detonation at 2.55 s, next orange at 4.00 s. Second video
   (youtu.be/RNZA_QjX3NE ~7:40, 60 fps) agrees: orange 0.67 s, lines exactly 4.0 s apart.
   User confirmed (2026-11-17): the line kills when the orange finishes, if you are inside it.
-- Lasers (rougher estimate): cross the centre ~3.85 s after the strike and keep travelling through the next one.
+- Lasers, from the user's frame counts (RNZA_QjX3NE 4:30-4:40, 60 fps): visible on its wall ~100 frames before it
+  moves, starts sweeping ~20 frames after the hard circle resolves (~strike +2.9 s), crosses in ~150 frames (2.5 s);
+  far-wall arrival frame-checked at 4:39.92. Wrong earlier versions: 0.7 s crossing; "stands 1 s, moves at next strike".
+  User played it and confirmed the sweep feels right (2026-11-17).
 - Sizes: 40 m arena, 4 m line width, 3 m circle, beams 5 m apart with one crossing dead centre.
 - Hard-mode circle, measured on 3 circles in the 60 fps video: appears 0.71 / 0.98 / 1.33 s after the strike
   (not fixed), stays where it dropped, resolves 1.82-1.88 s later (0.6-1.3 s after the detonation). Trainer uses

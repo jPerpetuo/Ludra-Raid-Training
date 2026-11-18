@@ -97,8 +97,10 @@ const CFG = {
     { deg: 90, through: [0, 0] },
     { deg: 135, through: [0, 0] },
   ],
-  // a row appears on its wall afterStrike seconds after the line strikes, waits `hold`, then crosses in `travel`
-  laser: { spacing: 5, radius: 1.1, afterStrike: 1.35, hold: 1.2, travel: 2.6 },
+  // a row appears on its wall afterStrike seconds after the line strikes, waits `hold`, then crosses in `travel`.
+  // From a player's frame counts (60 fps video): visible on its wall ~100 frames (1.65 s) before it moves, starts
+  // moving ~20 frames after the hard circle resolves (~2.9 s after the strike), crosses in ~150 frames (2.5 s).
+  laser: { spacing: 5, radius: 1.1, afterStrike: 1.25, hold: 1.65, travel: 2.5 },
   // sweeps[i] = laser rows that follow line i. from = compass bearing the row comes from (0 N, 90 E, 180 S, 270 W).
   // phase 0 = a beam crosses the centre, 0.5 = the centre is a gap.
   sweeps: [
