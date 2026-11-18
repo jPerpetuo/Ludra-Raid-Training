@@ -1,6 +1,9 @@
 <!doctype html>
+<!-- Ludra Raid Training: practice tool for AION 2's Ludra (Sanctuary raid). Made by mtkです [Siel] - South America.
+     Open source (MIT): https://github.com/mtkkk/Ludra-Raid-Training. Unofficial; not affiliated with NCSOFT. -->
 <html lang="en">
 <head>
+<meta name="author" content="mtkです [Siel] - South America">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ludra Raid Training</title>
@@ -55,7 +58,8 @@
   dl { margin:0; display:grid; grid-template-columns:auto 1fr; gap:5px 10px; font-size:13px; } dt { color:var(--dim); } dd { margin:0; }
   kbd { padding:1px 6px; border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; background:#0d121b; font:12px ui-monospace,Consolas,monospace; color:var(--text); }
   .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:-1px; }
-  .foot { color:#5d687c; font-size:11.5px; } #err { color:var(--bad); }
+  .foot { color:#5d687c; font-size:11.5px; line-height:1.7; } #err { color:var(--bad); }
+  .mhead .credit { color:var(--dim); font-size:12px; margin-top:3px; } .mhead .credit b { color:#ffd56b; font-weight:700; }
 </style>
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
 </head>
@@ -69,7 +73,7 @@
 </div>
 <div id="menu">
   <div class="wrap">
-    <header class="mhead"><h1>Ludra Raid Training</h1><div class="sub">Sanctuary raid · pick a mechanic to practise</div><div id="err"></div></header>
+    <header class="mhead"><h1>Ludra Raid Training</h1><div class="sub">Sanctuary raid · pick a mechanic to practise</div><div class="credit">by <b>mtkです</b> [Siel] · South America</div><div id="err"></div></header>
     <div class="row" id="resumeRow"><button id="resume">Resume</button></div>
     <div class="cards">
       <section class="card" id="cardZikel">
@@ -109,7 +113,7 @@
       <div><div class="label">Controls</div>
         <dl><dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Move (relative to camera)</dd><dt>Mouse</dt><dd>Look · wheel zooms</dd><dt><kbd>Shift</kbd></dt><dd>Dodge (uses stamina)</dd><dt><kbd>Space</kbd></dt><dd>Jump</dd><dt><kbd>R</kbd></dt><dd>Restart</dd><dt><kbd>Esc</kbd></dt><dd>This menu</dd></dl></div>
     </section>
-    <div class="foot" style="text-align:center">Unofficial fan-made practice tool. Not affiliated with NCSOFT.</div>
+    <div class="foot" style="text-align:center">Made by mtkです [Siel] · South America<br>Unofficial fan-made practice tool. Not affiliated with NCSOFT.</div>
   </div>
 </div>
 <script>setTimeout(() => { if (!window.zikel) document.getElementById('err').textContent = 'Could not load the 3D library. Check your internet connection and reload.'; }, 6000);</script>
@@ -124,7 +128,7 @@ const CFG = {
   start: [0, -15],       // near the north wall, where melee players stand under Ludra
   player: { speed: 6, radius: 0.5 },
   dodge: { iframes: 0.4, dash: 4, dashTime: 0.25, stamina: 100, cost: 20, regen: 10 },   // regen = stamina per second
-  dodgeAvoids: { circle: true, laser: false, strike: false, blast: false },
+  dodgeAvoids: { circle: true, laser: false, strike: false, blast: false, breath: false },
   jump: { height: 1.5, time: 0.35 },   // Space: peak height (m) and time to reach it (s)
   intro: 3,              // seconds before line 1 strikes
   lineEvery: 4,          // seconds between strikes
@@ -173,6 +177,22 @@ const CFG = {
     // at ~6.4 s left (13.6 s) with an estimated 1-2 s to spare. Marker time, start height, landing time and reach
     // are estimates. reach = how high a standing player can touch; a jump adds CFG.jump.height.
     orb: { dist: 15, mark: 8.5, spawn: 9.0, land: 14.9, height: 9, radius: 0.9, reach: 2.2, grabRange: 1.4, botGrab: 13.5 },
+    // Ludra's breath across the board, from a random vertex along that diagonal (read off the cast bar: orange
+    // telegraph at 11.5 s left, breath from 10.9 s left until 8.5 s left). Touching it kills. half = half-width of the
+    // band (estimate): squares next to the diagonal are safe only in their far corner.
+    // Two breaths per board, each from its own random vertex. Ludra flies to a spot past that vertex (`perch` m out,
+    // taking `fly` s; she starts over the middle of the board and drifts slowly to her 1st spot from the moment the
+    // board appears, and the 2nd flight starts as soon as the 1st breath ends, user-confirmed), waits there, and turns
+    // to the middle; her orange line sweeps across the board with her (tele) until it settles
+    // on the diagonal (settle), fills up, and she breathes (start) until `end`. Times read off the cast bar by the user:
+    // 1st: line moves at 12.0 s left, settles 11.3, fires 10.8, ends 8.5. 2nd: moves 3.2, settles 2.4, fires 1.9, lasts
+    // until the cast ends. Fly time, perch distance and turn angle are estimates.
+    breath: { half: 4.2, perch: 8, fly: 1.1, turn: 55,
+      times: [{ tele: 8.0, settle: 8.7, start: 9.2, end: 11.5 }, { tele: 16.8, settle: 17.6, start: 18.1, end: 20.0 }] },
+    // when "Ludra's Trial" has 2.5 s left, a huge red ball (meteor) comes down over the middle of the board; it hits
+    // as the cast ends and kills everyone outside the safe square (that kill is the Trial check). Visual only;
+    // radius and height are estimates.
+    meteor: { lead: 2.5, radius: 7, height: 11, arrive: 0.5 },   // height = where it hangs after flying in (arrive s)
     // each corner pair: "outside" walks the outer edge, "inside" the row/column next to it
     paths: {
       1: { outside: [[5, 0], [4, 0], [3, 0], [2, 0]], inside: [[5, 1], [4, 1], [3, 1], [2, 1]] },
@@ -201,6 +221,8 @@ const saveOpts = () => { try { localStorage.zikelTrainer = JSON.stringify(opts);
 const cam = { yaw: 0, pitch: CFG.camera.pitch, dist: CFG.camera.distance };
 const SIDE = { 0: 'north', 90: 'east', 180: 'south', 270: 'west' };
 let S = null, endedAt = 0, menuOpen = true;
+const GUILD = ['Sulong', 'Sete', 'zPedra', 'Khorham', 'SharkAll', 'Daniel', 'Skazy', 'Chryver', 'Penha', 'ASMRespirito', 'guimaZ',
+  'Comac', 'Brownie', 'Delta', 'Young', 'Seraaph', 'Seithr', 'OguriCap', 'ArrancaPau', 'Hades', 'Tayx', 'Ludin', 'SongWeaver', 'BrunnO'];
 
 function baseState(mech, start, end) {
   return { mech, phase: 'run', t: 0, end, lines: [], sweeps: [], circles: [], drops: [], filled: [], fails: [], hard: opts.hard,
@@ -223,16 +245,29 @@ function newRun(mech) {
     }
     for (let i = 0; i < 8; i += 2) { actors[i].mate = actors[i + 1]; actors[i + 1].mate = actors[i]; }
     const d = B.orb.dist, axis = Math.random() < 0.5 ? [[0, -d], [0, d]] : [[d, 0], [-d, 0]];   // north + south or east + west
-    const orbs = axis.map(([x, y]) => ({ x, y, grabbed: null, landed: false, owner: null }));
+    // wait = a spot 4 m to the side of the orb (still off the board) where the centre player drops their 3rd circle
+    const orbs = axis.map(([x, y]) => { const l = Math.hypot(x, y); return { x, y, wait: [x - y / l * 4, y + x / l * 4], grabbed: null, landed: false, owner: null }; });
     B.center.forEach((c, ci) => {
       const me = role === 'centre' && ci === 0, path = c.path.map(step);
       while (path.length < B.count) path.push({ xy: axis[c.orb], tile: -1 });
       const a = actor(me ? 'you' : c.name, 'centre', me, path); a.orb = c.orb; orbs[c.orb].owner = a; actors.push(a);
     });
     actors.forEach((a, i) => { a.z = 0; a.vz = 0; a.spot = [Math.cos(i * 0.63) * 1.1, Math.sin(i * 0.63) * 1.1]; });   // spot = where each stands in the safe square
+    // the breath comes from a random vertex (1 SW, 2 NW, 3 NE, 4 SE) along the diagonal through it
+    // never twice from the same corner: each breath picks one of the other 3 (user-confirmed)
+    const breaths = [];
+    for (const tm of B.breath.times) {
+      let v; do v = 1 + Math.floor(Math.random() * 4); while (breaths.length && v === breaths[breaths.length - 1].v);
+      breaths.push(makeBreath(v, tm));
+    }
+    // teammates get guild names: mtkです always, the rest picked at random
+    const pool = GUILD.slice();
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    const npcs = actors.filter((a) => !a.me), mtk = Math.floor(Math.random() * npcs.length);
+    npcs.forEach((a, i) => { a.name = i === mtk ? 'mtkです' : pool.pop(); });
     const me = actors.find((a) => a.me);
     S = Object.assign(baseState('bingo', [me.x, me.y], B.trialStart + B.trial + 0.8), {
-      waves, actors, orbs, trialEnd: B.trialStart + B.trial, trialDone: false, safe: Math.floor(Math.random() * B.grid * B.grid), found: null,
+      waves, actors, orbs, breaths, breath: breaths[0], trialEnd: B.trialStart + B.trial, trialDone: false, safe: Math.floor(Math.random() * B.grid * B.grid), found: null, missed: [],
       who: role === 'centre' ? 'Centre (orb)' : 'Corner ' + opts.bCorner + ' ' + role });
     return;
   }
@@ -266,6 +301,77 @@ function fall(o, dt) { if (o.z > 0 || o.vz > 0) { o.z += o.vz * dt; o.vz -= JG *
 // orb centre height: from `height` at spawn straight down to resting on the ground at `land`
 function orbHeight(t) { const O = CFG.bingo.orb; return O.radius + (O.height - O.radius) * clamp(1 - (t - O.spawn) / (O.land - O.spawn), 0, 1); }
 const orbReachable = (t, z) => z + CFG.bingo.orb.reach >= orbHeight(t) - CFG.bingo.orb.radius;
+// breath: distance from the diagonal, whether a player standing at (x, y) is touched, and the safe far corner of a square
+// vertex v (1 SW, 2 NW, 3 NE, 4 SE) and its times; d = unit direction from the vertex across the board
+function makeBreath(v, tm) {
+  const bh = CFG.bingo.grid * CFG.bingo.tile / 2, vx = v === 3 || v === 4 ? bh : -bh, vy = v === 1 || v === 4 ? bh : -bh, l = Math.hypot(vx, vy);
+  return Object.assign({ v, vx, vy, dx: -vx / l, dy: -vy / l, sweep: Math.random() < 0.5 ? -1 : 1 }, tm);   // sweep = which side her line swings in from
+}
+// where Ludra is and which way she faces at time t (h = height offset). Zikel: north of the arena. Bingo board: she
+// starts high over the middle of the board, flies to her spot for each breath, turns to the middle there (the orange
+// line follows her aim) and stays until she flies to the next one
+const LUDRA_HOME = { x: 0, z: -CFG.arenaSize / 2 - 12, yaw: 0 };
+const LUDRA_PERCH_H = -4, LUDRA_CENTRE_H = 7;
+function ludraPose(t) {
+  const BR = CFG.bingo.breath, turn = BR.turn * Math.PI / 180, ease = (k) => k * k * (3 - 2 * k);
+  if (!S || S.mech !== 'bingo') return { x: LUDRA_HOME.x, z: LUDRA_HOME.z, yaw: LUDRA_HOME.yaw, off: 0, h: 0 };
+  let x = 0, z = 0, yaw = 0, off = 0, h = LUDRA_CENTRE_H, prevEnd = null;
+  for (const b of S.breaths) {
+    // later flights start as soon as the previous breath ends and take BR.fly
+    // (the 1st one drifts slowly from the moment the board appears, landing just before the line shows)
+    const t0 = prevEnd == null ? 0 : prevEnd, dur = prevEnd == null ? Math.max(BR.fly, b.tele - 0.4) : BR.fly;
+    if (t < t0) break;
+    const sx = b.vx - b.dx * BR.perch, sz = b.vy - b.dy * BR.perch, face = Math.atan2(b.dx, b.dy), aim0 = face + b.sweep * turn;
+    if (t < t0 + dur) {   // flying over
+      const k = ease((t - t0) / dur); let dyaw = aim0 - yaw; dyaw = Math.atan2(Math.sin(dyaw), Math.cos(dyaw));
+      // rises over the board on the way (arc), then settles at her spot's height
+      return { x: x + (sx - x) * k, z: z + (sz - z) * k, yaw: yaw + dyaw * k, off: 0, fly: true, h: h + (LUDRA_PERCH_H - h) * k + 6 * Math.sin(Math.PI * k) };
+    }
+    if (t < b.tele) return { x: sx, z: sz, yaw: aim0, off: 0, h: LUDRA_PERCH_H };   // landed: waits there until she turns
+    prevEnd = b.end;
+    const k = t < b.settle ? 1 - (1 - (t - b.tele) / (b.settle - b.tele)) ** 2 : 1;   // turning to the middle
+    x = sx; z = sz; off = b.sweep * turn * (1 - k); yaw = face + off; h = LUDRA_PERCH_H;
+  }
+  return { x, z, yaw, off, h };
+}
+// the breath that is on or comes next at time t (S.breath is kept set to it)
+const breathAt = (t) => S.breaths.find((b) => t < b.end) || S.breaths[S.breaths.length - 1];
+const breathDist = (x, y) => Math.abs(x * S.breath.dy - y * S.breath.dx);
+const breathWindow = (t) => { const b = breathAt(t); return t >= b.tele && t < b.end; };
+const breathSoon = (t) => { const b = breathAt(t); return t >= b.tele - 0.6 && t < b.tele; };   // which diagonal isn't known yet
+function inBand(x, y, dx, dy) {
+  const B = CFG.bingo, bh = B.grid * B.tile / 2, r = CFG.player.radius;
+  return Math.abs(x) <= bh + r && Math.abs(y) <= bh + r && Math.abs(x * dy - y * dx) < B.breath.half + r;
+}
+const inBreath = (x, y) => inBand(x, y, S.breath.dx, S.breath.dy);
+const inEitherDiagonal = (x, y) => inBand(x, y, Math.SQRT1_2, Math.SQRT1_2) || inBand(x, y, Math.SQRT1_2, -Math.SQRT1_2);
+function breathOnPath(x0, y0, x1, y1) {   // does walking straight from (x0, y0) to (x1, y1) go through the breath?
+  for (let i = 1; i <= 12; i++) { const k = i / 12, x = x0 + (x1 - x0) * k, y = y0 + (y1 - y0) * k; if (inBreath(x, y) && !(S.found && tileAt(x, y) === S.safe)) return true; }
+  return false;
+}
+function breathCorner(tile) {
+  const B = CFG.bingo, c = sqXY(Math.floor(tile / B.grid), tile % B.grid), h = B.tile / 2 - 0.5;
+  let best = c, bd = -1;
+  for (const sx of [-1, 1]) for (const sy of [-1, 1]) { const p = [c[0] + sx * h, c[1] + sy * h], d = breathDist(p[0], p[1]); if (d > bd) { bd = d; best = p; } }
+  return best;
+}
+// where a centre player should be while on orb duty: beside the orb until their 3rd circle snaps (so it drops off
+// the orb spot), then under the orb
+const orbTarget = (o, t) => (t < S.waves[2].tSnap ? o.wait : [o.x, o.y]);
+// snapped red circles that are about to resolve, and whether (x, y) is in one of them
+function liveCircles(t) { const i = S.waves.findIndex((w) => t >= w.tSnap && !w.done); return i < 0 ? [] : S.actors.map((a) => a.circ[i]).filter((c) => !c.none); }
+const inCircles = (cs, x, y) => cs.some((c) => Math.hypot(x - c.x, y - c.y) < CFG.bingo.radius + 0.3);
+// the closest spot outside every snapped circle (and out of the breath while it's on), leaning toward the target
+function circleExit(cs, x, y, tg, hot) {
+  let best = tg, bs = Infinity;
+  for (let r = 0.5; r <= 4.5; r += 0.5) for (let i = 0; i < 24; i++) {
+    const ang = i * Math.PI / 12, px = x + Math.cos(ang) * r, py = y + Math.sin(ang) * r;
+    if (inCircles(cs, px, py) || (hot && inBreath(px, py))) continue;
+    const sc = r + 0.3 * Math.hypot(tg[0] - px, tg[1] - py);
+    if (sc < bs) { bs = sc; best = [px, py]; }
+  }
+  return best;
+}
 function bingoStep(t, P, inv, A, dt) {
   const B = CFG.bingo, O = B.orb, k = snapsPassed(t);
   // bots hold their square until their circle snaps, then walk to the next one. The centre players go to their orb
@@ -274,17 +380,63 @@ function bingoStep(t, P, inv, A, dt) {
   // from their partner.
   const safeXY = sqXY(Math.floor(S.safe / B.grid), S.safe % B.grid);
   const inSafe = (x, y) => !!S.found && tileAt(x, y) === S.safe;
+  const live = liveCircles(t);   // snapped circles that haven't resolved yet: nobody walks into one
+  S.breath = breathAt(t);
   for (const a of S.actors) {
-    if (a.me) { a.x = P.x; a.y = P.y; continue; }
+    if (a.me) { a.x = P.x; a.y = P.y; a.z = P.z; if (!S.auto) continue; }   // S.auto (scripted tests only): you follow the bot rules
+    if (a.dead) continue;
     const last = a.path[a.path.length - 1], orb = a.orb != null ? S.orbs[a.orb] : null;
     const orbDuty = !!orb && !orb.grabbed && !orb.landed && (k >= 2 || !!S.found);
     let tg = a.path[Math.min(k, a.path.length - 1)].xy;
-    if (orbDuty) { tg = [orb.x, orb.y]; if (t >= O.botGrab && a.z === 0 && Math.hypot(a.x - orb.x, a.y - orb.y) < 1) a.vz = JV; }
+    // jump into the orb at the usual time, or as soon as a jump reaches it once the safe square is found (to get
+    // there before the 2nd breath)
+    const jumpNow = t >= O.botGrab || (!!S.found && orbReachable(t + CFG.jump.time, CFG.jump.height));
+    if (orbDuty) { tg = orbTarget(orb, t); if (jumpNow && a.z === 0 && Math.hypot(a.x - orb.x, a.y - orb.y) < 1) a.vz = JV; }
     else if (S.found) tg = [safeXY[0] + a.spot[0], safeXY[1] + a.spot[1]];
+    else if (orb && (orb.grabbed || orb.landed)) tg = k >= S.waves.length ? [orb.x, orb.y] : orb.wait;   // orb done, safe square not found yet: drop the 4th circle beside the orb, then step back
     else if (k >= S.waves.length && last.tile >= 0) { const m = a.mate.path[a.mate.path.length - 1].xy, ux = last.xy[0] - m[0], uy = last.xy[1] - m[1], l = Math.hypot(ux, uy) || 1; tg = [last.xy[0] + ux / l * 2.5, last.xy[1] + uy / l * 2.5]; }
+    // during the breath, anyone whose square is in its path holds the safe far corner of that square
+    if (breathWindow(t) && !inSafe(tg[0], tg[1]) && inBreath(tg[0], tg[1])) { const tl = tileAt(tg[0], tg[1]); if (tl >= 0) tg = breathCorner(tl); }
+    // never wait inside your own red circle: if the target is in it, stand just outside it instead until it resolves
+    const wi = S.waves.findIndex((w) => t >= w.tSnap && !w.done);
+    if (wi >= 0 && !inSafe(tg[0], tg[1])) {
+      const c = a.circ[wi];
+      if (Math.hypot(tg[0] - c.x, tg[1] - c.y) < B.radius + 0.6) {
+        let ux = a.x - c.x, uy = a.y - c.y, l = Math.hypot(ux, uy);
+        if (l < 0.05) { ux = tg[0] - c.x; uy = tg[1] - c.y; l = Math.hypot(ux, uy); }
+        if (l < 0.05) { ux = -c.x; uy = -c.y; l = Math.hypot(ux, uy) || 1; }
+        tg = [c.x + ux / l * (B.radius + 0.8), c.y + uy / l * (B.radius + 0.8)];
+      }
+    }
+    // breath: if caught in it, leave by the shortest way out unless the target already leads out; never walk into it
+    // (wait at its edge); and while running to the safe square just before it, don't cut through either diagonal.
+    // Exception: a runner who can be inside the safe square before the breath starts just goes (it only kills once
+    // it starts, and after the 2nd breath there's no time left)
+    const rush = !!S.found && inSafe(tg[0], tg[1]) && t < S.breath.start && Math.hypot(tg[0] - a.x, tg[1] - a.y) / B.botSpeed < S.breath.start - t - 0.15;
+    const hot = breathWindow(t) && !rush, caught = hot && inBreath(a.x, a.y) && !inSafe(a.x, a.y);
+    // standing in a snapped circle (yours or someone else's): get out the shortest way that doesn't lead into another
+    // (unless the safe square is right there: inside it you're immune)
+    const nearSafe = inSafe(tg[0], tg[1]) && Math.hypot(tg[0] - a.x, tg[1] - a.y) < 2.5;
+    if (!inSafe(a.x, a.y) && !nearSafe && inCircles(live, a.x, a.y)) tg = circleExit(live, a.x, a.y, tg, hot);
+    if (caught) {
+      const s = Math.sign(a.x * S.breath.dy - a.y * S.breath.dx) || 1, nx = S.breath.dy * s, ny = -S.breath.dx * s, l = Math.hypot(tg[0] - a.x, tg[1] - a.y) || 1;
+      if (((tg[0] - a.x) * nx + (tg[1] - a.y) * ny) / l < 0.5) tg = [a.x + nx * 6, a.y + ny * 6];
+    }
+    const danger = (x, y) => !inSafe(x, y) && ((hot ? inBreath(x, y) : !rush && S.found && breathSoon(t) && inEitherDiagonal(x, y)) || inCircles(live, x, y));
     const dx = tg[0] - a.x, dy = tg[1] - a.y, d = Math.hypot(dx, dy);
-    if (d > 1e-6) { const s = Math.min(1, B.botSpeed * dt / d); a.x += dx * s; a.y += dy * s; }
+    if (d > 1e-6) {
+      const s = Math.min(1, B.botSpeed * dt / d), nx = a.x + dx * s, ny = a.y + dy * s;
+      if (caught || danger(a.x, a.y) || !danger(nx, ny)) { a.x = nx; a.y = ny; }
+    }
+    if (a.me) { P.x = a.x; P.y = a.y; if (a.vz) { P.vz = a.vz; a.vz = 0; } a.z = P.z; continue; }
     fall(a, dt);
+  }
+  // breath: instant kill for anyone it touches (the safe square protects); teammates it touches fall too
+  const burning = t >= S.breath.start && t < S.breath.end;
+  if (burning) for (const a of S.actors) if (!a.me && !a.dead && !inSafe(a.x, a.y) && inBreath(a.x, a.y)) a.dead = t;
+  if (burning && !inSafe(P.x, P.y) && inBreath(P.x, P.y) && !(inv && A.breath)) {
+    fail("Ludra's breath hit you" + (S.found && S.found.wave === S.waves.length ? ' (the safe square was found on the last circle: very hard to reach in time)' : ''));
+    if (S.phase !== 'run') return;
   }
   // orbs: anyone close enough whose reach (standing, or jumping) touches the orb grabs it; if it lands first, it's lost
   for (const o of S.orbs) {
@@ -298,27 +450,33 @@ function bingoStep(t, P, inv, A, dt) {
   for (let i = 0; i < S.waves.length; i++) {
     const w = S.waves[i];
     if (w.done || t < w.t0) continue;
-    for (const a of S.actors) { const c = a.circ[i]; if (!c.snapped) { c.x = a.x; c.y = a.y; if (t >= w.tSnap) c.snapped = true; } }   // circles follow until they snap
+    for (const a of S.actors) { const c = a.circ[i]; if (!c.snapped) { c.x = a.x; c.y = a.y; if (a.dead) c.none = true; if (t >= w.tSnap) c.snapped = true; } }   // circles follow until they snap (the fallen get none)
     if (t < w.t1) continue;
     w.done = true;
     const foundBefore = !!S.found;   // once it's found, nobody sweeps any more
     for (const a of S.actors) {
-      const c = a.circ[i], tile = tileAt(c.x, c.y);
+      const c = a.circ[i], tile = c.none ? -1 : tileAt(c.x, c.y);
       if (tile >= 0) { S.filled[tile] = true; if (tile === S.safe && !S.found) S.found = { by: a.name, wave: w.n, t }; }
-      if (a.me && !foundBefore && a.path[i].tile >= 0 && tile !== a.path[i].tile) { fail('Circle ' + w.n + ': your circle landed outside your square'); if (S.phase !== 'run') return; }
+      // missing your square isn't deadly by itself: it only matters if that square was the safe one (then nobody finds it)
+      if (a.me && !foundBefore && a.path[i].tile >= 0 && tile !== a.path[i].tile) S.missed.push({ wave: w.n, tile: a.path[i].tile, t });
     }
     if (inSafe(P.x, P.y)) continue;   // inside the safe square you take no damage
     for (const a of S.actors) {
       const c = a.circ[i];
-      if (Math.hypot(P.x - c.x, P.y - c.y) < B.radius && !(inv && A.circle)) { fail('Circle ' + w.n + ': hit by ' + (a.me ? 'your own circle' : a.name + "'s circle")); if (S.phase !== 'run') return; }
+      if (!c.none && Math.hypot(P.x - c.x, P.y - c.y) < B.radius && !(inv && A.circle)) { fail('Circle ' + w.n + ': hit by ' + (a.me ? 'your own circle' : a.name + "'s circle")); if (S.phase !== 'run') return; }
     }
   }
   if (!S.trialDone && t >= S.trialEnd) {
     S.trialDone = true;
-    if (!S.found) { fail("Ludra's Trial ended and the safe square was never found"); if (S.phase !== 'run') return; }
+    for (const a of S.actors) if (!a.me && !a.dead && !inSafe(a.x, a.y)) a.dead = t;   // the meteor: teammates outside fall
+    if (!S.found) {
+      const mine = S.missed.find((m) => m.tile === S.safe);
+      fail("Ludra's Trial ended and the safe square was never found" + (mine ? ': it was your square on circle ' + mine.wave + ', and your circle landed outside it' : ''));
+      if (S.phase !== 'run') return;
+    }
     else if (!inSafe(P.x, P.y)) {
       const late = S.found.wave === S.waves.length ? ' (it was found on the last circle: from far away it can\'t be reached in time)' : '';
-      fail("Ludra's Trial ended while you were outside the safe square" + late); if (S.phase !== 'run') return;
+      fail("Ludra's Trial: the meteor hit you outside the safe square" + late); if (S.phase !== 'run') return;
     }
   }
   if (t >= S.end) finish(true);
@@ -440,9 +598,11 @@ for (let i = 0; i < 4; i++) {
   g.add(w, b); scene.add(g);
 }
 
-// Ludra: an abstract winged shape north of the arena, as the orientation reference
+// Ludra: an abstract winged shape north of the arena, as the orientation reference (on the Bingo board she flies to a
+// corner before each breath)
+const ludra = new THREE.Group();
 {
-  const g = new THREE.Group(); g.position.set(0, 0, -HALF - 12);
+  const g = ludra; g.position.set(0, 0, -HALF - 12);
   const dark = new THREE.MeshStandardMaterial({ color: 0x33235a, flatShading: true, emissive: 0x160b2e, roughness: 0.7, side: THREE.DoubleSide });
   const body = new THREE.Mesh(new THREE.IcosahedronGeometry(5, 0), dark); body.scale.set(1, 1.6, 1); body.position.y = 11;
   const wing = new THREE.BufferGeometry();
@@ -535,6 +695,71 @@ const target = new THREE.Group(); target.visible = false; scene.add(target);
   const m = flat(0x3ee0b0, 0.95), geo = flatGeo(BG.tile - 0.3, 0.18);
   for (let i = 0; i < 4; i++) { const g = new THREE.Group(); g.rotation.y = i * Math.PI / 2; const s = ground(geo, m, 0.045, 3); s.position.z = -(BG.tile - 0.3) / 2; g.add(s); target.add(g); }
 }
+// Ludra's breath: the orange line comes out of Ludra and swings across the board as she turns, settles on the
+// diagonal, fills up, then the burning beam. breathViz sits at Ludra's spot and turns with her; bInner is shifted so
+// its origin is the middle of the board. Clipped to the board.
+const CLIPB = [new THREE.Plane(new THREE.Vector3(1, 0, 0), BH), new THREE.Plane(new THREE.Vector3(-1, 0, 0), BH), new THREE.Plane(new THREE.Vector3(0, 0, 1), BH), new THREE.Plane(new THREE.Vector3(0, 0, -1), BH)];
+const BLEN = BS * Math.SQRT2 + 2, BW = BG.breath.half * 2, LD = BH * Math.SQRT2 + BG.breath.perch;   // LD = Ludra's spot to the middle
+const breathViz = new THREE.Group(), bInner = new THREE.Group(); bInner.position.x = LD; breathViz.add(bInner); breathViz.visible = false; scene.add(breathViz);
+const bTeleMat = flat(0xff9a2e, 0.16, { clippingPlanes: CLIPB }), bFillMat = flat(0xff9a2e, 0.45, { clippingPlanes: CLIPB }), bEdgeMat = flat(0xffb45e, 0.95, { clippingPlanes: CLIPB });
+const bBeamMat = flat(0xff6a2a, 0.55, { clippingPlanes: CLIPB, blending: ADD }), bCoreMat = flat(0xfff0c8, 0.8, { clippingPlanes: CLIPB, blending: ADD });
+const bTele = new THREE.Group(), bBeam = new THREE.Group(), bFlames = [];
+const bSkyCoreMat = flat(0xfff2fb, 0.9, { blending: ADD, side: THREE.DoubleSide }), bSkyGlowMat = flat(0xff5ab8, 0.35, { blending: ADD, side: THREE.DoubleSide });
+const flameTex = canvasTex(128, 128, (g, w, h) => {
+  const gr = g.createRadialGradient(w / 2, h * 0.62, 2, w / 2, h * 0.62, w / 2);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.25, 'rgba(255,190,255,.85)'); gr.addColorStop(0.6, 'rgba(200,80,255,.35)'); gr.addColorStop(1, 'rgba(120,0,200,0)');
+  g.fillStyle = gr; g.beginPath(); g.moveTo(w * 0.1, h * 0.75);
+  for (let i = 0; i <= 8; i++) { const x = w * (0.1 + 0.8 * i / 8); g.lineTo(x, i % 2 ? h * (0.05 + 0.2 * ((i * 37) % 5) / 5) : h * 0.45); }
+  g.lineTo(w * 0.9, h * 0.75); g.quadraticCurveTo(w / 2, h * 1.05, w * 0.1, h * 0.75); g.fill();
+});
+{
+  const band = flatGeo(BLEN, BW), edge = flatGeo(BLEN, 0.16);
+  // the fill widens from the middle of the line out to its edges once it has settled, like the circles filling up
+  bTele.add(ground(band, bTeleMat, 0.085, 4)); bTele.userData.fill = ground(flatGeo(BLEN, BW), bFillMat, 0.09, 4); bTele.add(bTele.userData.fill);
+  const e1 = ground(edge, bEdgeMat, 0.095, 4), e2 = ground(edge, bEdgeMat, 0.095, 4); e1.position.z = BG.breath.half; e2.position.z = -BG.breath.half; bTele.add(e1, e2);
+  bBeam.add(ground(band, bBeamMat, 0.09, 4), ground(flatGeo(BLEN, BW * 0.35), bCoreMat, 0.095, 4));
+  // the breath itself: a thick white-pink beam from Ludra's mouth down onto the middle of the board
+  const src = new THREE.Vector3(-LD + 4.5, 9, 0), dir = new THREE.Vector3().sub(src), L = dir.length() + 4;
+  const sky = new THREE.Group(); sky.position.copy(src).addScaledVector(dir.clone().normalize(), L / 2);
+  sky.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+  const skyCore = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.9, L, 20, 1, true), bSkyCoreMat), skyGlow = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2.3, L, 24, 1, true), bSkyGlowMat);
+  skyCore.renderOrder = skyGlow.renderOrder = 8; sky.add(skyCore, skyGlow); bBeam.add(sky);
+  // purple flames bursting along the band
+  const rnd = (() => { let s = 11; return () => ((s = (s * 16807) % 2147483647) / 2147483647); })();
+  for (let i = 0; i < 16; i++) {
+    const f = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, color: i % 3 ? 0xd05cff : 0xff6ad8, blending: ADD, transparent: true, depthWrite: false, fog: false, clippingPlanes: CLIPB }));
+    f.position.set((rnd() - 0.5) * BS * 1.25, 1.2, (rnd() - 0.5) * BW * 0.85); f.userData = { ph: rnd() * 7, s: 2.6 + rnd() * 2.2, x: f.position.x, z: f.position.z };
+    f.renderOrder = 8; bFlames.push(f); bBeam.add(f);
+  }
+  bInner.add(bTele, bBeam);
+}
+// the meteor at the end of "Ludra's Trial": a cracked magenta ball with a glow, a red mark on the board under it,
+// and a shockwave ring when it hits
+const meteor = new THREE.Group(); meteor.visible = false; scene.add(meteor);
+const meteorTex = canvasTex(1024, 512, (g, w, h) => {
+  g.fillStyle = '#3c0832'; g.fillRect(0, 0, w, h);
+  const rnd = (() => { let s = 7; return () => ((s = (s * 16807) % 2147483647) / 2147483647); })();
+  for (let i = 0; i < 60; i++) { g.fillStyle = 'rgba(150,30,110,' + (0.15 + rnd() * 0.25) + ')'; g.beginPath(); g.arc(rnd() * w, rnd() * h, 20 + rnd() * 70, 0, 7); g.fill(); }
+  g.shadowColor = '#ff3fb0'; g.shadowBlur = 10; g.lineCap = 'round';
+  for (let i = 0; i < 170; i++) {   // glowing cracks
+    let x = rnd() * w, y = rnd() * h; g.strokeStyle = rnd() < 0.25 ? '#ffe6f8' : '#ff6ccc'; g.lineWidth = 0.8 + rnd() * 2.4; g.beginPath(); g.moveTo(x, y);
+    for (let k = 0; k < 7; k++) { x += (rnd() - 0.5) * 70; y += (rnd() - 0.5) * 50; g.lineTo(x, y); }
+    g.stroke();
+  }
+});
+const MR = BG.meteor.radius;
+const meteorBall = new THREE.Mesh(new THREE.SphereGeometry(MR, 48, 32), new THREE.MeshBasicMaterial({ map: meteorTex, transparent: true, opacity: 0.92, fog: false }));
+const meteorCore = new THREE.Mesh(new THREE.SphereGeometry(MR * 0.35, 24, 16), flat(0xffe6f6, 0.9, { blending: ADD }));
+const meteorGlowMat = flat(0xff3a8a, 0.35, { blending: ADD, side: THREE.BackSide });
+const meteorGlow = new THREE.Mesh(new THREE.SphereGeometry(MR * 1.18, 32, 24), meteorGlowMat);
+meteorCore.renderOrder = 8; meteorGlow.renderOrder = 8;
+const meteorBody = new THREE.Group(); meteorBody.add(meteorBall, meteorCore, meteorGlow);
+const meteorMarkMat = flat(0xff2a6a, 0.3, { clippingPlanes: CLIPB }), meteorRingMat = flat(0xff6aa8, 0.9);
+const meteorMark = ground(new THREE.CircleGeometry(BS * 0.75, 64).rotateX(-Math.PI / 2), meteorMarkMat, 0.1, 5);
+const meteorRing = ground(new THREE.RingGeometry(0.92, 1, 96).rotateX(-Math.PI / 2), meteorRingMat, 0.12, 7);
+meteor.add(meteorBody, meteorMark, meteorRing);
+// the safe far corner to stand in during the breath
+const cornerMark = ground(new THREE.RingGeometry(0.45, 0.62, 32).rotateX(-Math.PI / 2), flat(0x3ee0b0, 0.95), 0.1, 7); cornerMark.visible = false; scene.add(cornerMark);
 // small ground arrow next to you, pointing at where to go next (shown with callouts on)
 const arrow = new THREE.Group(); arrow.visible = false; scene.add(arrow);
 {
@@ -545,8 +770,18 @@ const arrow = new THREE.Group(); arrow.visible = false; scene.add(arrow);
 // teammates (bots): outside orange, inside blue, centre purple
 const MAXA = 10;
 const botMat = { outside: new THREE.MeshStandardMaterial({ color: 0xff8f6b, roughness: 0.6 }), inside: new THREE.MeshStandardMaterial({ color: 0x6bb8ff, roughness: 0.6 }), centre: new THREE.MeshStandardMaterial({ color: 0xb48cff, roughness: 0.6 }) };
-const botGeo = new THREE.CapsuleGeometry(0.42, 0.95, 4, 10);
+const botGeo = new THREE.CapsuleGeometry(0.42, 0.95, 4, 10), botDeadMat = new THREE.MeshStandardMaterial({ color: 0x5a5e6a, roughness: 0.9 });
 const bots = Array.from({ length: MAXA }, () => { const m = new THREE.Mesh(botGeo, botMat.outside); m.visible = false; scene.add(m); return m; });
+// name tags above the teammates (one texture per name, made once)
+const tagTex = new Map();
+const nameTag = (name) => {
+  if (!tagTex.has(name)) tagTex.set(name, canvasTex(256, 64, (g, w, h) => {
+    g.font = '700 30px system-ui,"Segoe UI","Yu Gothic UI","Meiryo",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.85)'; g.strokeText(name, w / 2, h / 2); g.fillStyle = name === 'mtkです' ? '#ffd56b' : '#dfe6f3'; g.fillText(name, w / 2, h / 2);
+  }));
+  return tagTex.get(name);
+};
+const tags = bots.map(() => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthWrite: false, fog: false })); s.scale.set(3.2, 0.8, 1); s.renderOrder = 9; s.visible = false; scene.add(s); return s; });
 // one circle per player (only one wave is up at a time)
 const bDiscGeo = new THREE.CircleGeometry(BG.radius, 48).rotateX(-Math.PI / 2), bRingGeo = new THREE.RingGeometry(BG.radius - 0.14, BG.radius, 64).rotateX(-Math.PI / 2);
 const actorCircles = Array.from({ length: MAXA }, () => {
@@ -588,7 +823,8 @@ function sync() {
     if (b >= 0 && b < 0.5) flash = Math.max(flash, 1 - b / 0.5);
   }
   blast.visible = flash > 0; blastMat.opacity = 0.9 * flash;
-  const fo = Math.round(flash * 28) / 100; if (fo !== flashShown) { flashShown = fo; $('flash').style.opacity = fo; }
+  const mHit = S && S.mech === 'bingo' && t >= S.trialEnd ? Math.max(0, 1 - (t - S.trialEnd) / 0.6) : 0;   // meteor impact
+  const fo = Math.round(Math.max(flash, mHit) * 28) / 100; if (fo !== flashShown) { flashShown = fo; $('flash').style.opacity = fo; }
 
   for (let i = 0; i < circleViz.length; i++) {
     const v = circleViz[i], c = S && S.circles.find((q) => q.n === i + 1), k = c ? (t - c.t0) / (c.t1 - c.t0) : 9;
@@ -609,6 +845,33 @@ function sync() {
   const isB = !!S && S.mech === 'bingo';
   board.visible = isB;
   if (isB) for (let k = 0; k < tiles.length; k++) tiles[k].visible = !!S.filled[k] && k !== (S.found ? S.safe : -1);
+  // breath: telegraph fills from the vertex, then the beam flickers until it ends
+  // Ludra: home in the north, or flying to / aiming from her breath spot (gentle bob while airborne)
+  const lp = ludraPose(t);
+  ludra.position.set(lp.x, lp.h + (isB ? 1.2 * Math.sin(t * 1.3) : 0), lp.z); ludra.rotation.y = lp.yaw; ludra.rotation.z = lp.fly ? 0.12 * Math.sin(t * 2) : 0;
+  const BR = isB ? S.breaths.find((b) => t < b.end + 0.2) : null;
+  breathViz.visible = !!BR && t >= BR.tele;
+  if (breathViz.visible) {
+    // the line points where Ludra faces (once the breath is over it stays put while it fades, as she flies off)
+    const done = t >= BR.end, P0 = BG.breath.perch;
+    breathViz.position.set(done ? BR.vx - BR.dx * P0 : lp.x, 0, done ? BR.vy - BR.dy * P0 : lp.z);
+    breathViz.rotation.y = (done ? Math.atan2(BR.dx, BR.dy) : lp.yaw) - Math.PI / 2;
+    bTele.visible = t < BR.start; bBeam.visible = !bTele.visible;
+    if (bTele.visible) {
+      const k = t < BR.settle ? 0 : (t - BR.settle) / (BR.start - BR.settle);
+      bTele.userData.fill.visible = k > 0; bTele.userData.fill.scale.z = Math.max(0.001, k);
+      bTeleMat.opacity = t < BR.settle ? 0.12 + 0.06 * Math.sin(t * 25) : 0.16;
+    }
+    else {
+      const f = t < BR.end ? 1 : 1 - (t - BR.end) / 0.2, on = Math.min(1, (t - BR.start) / 0.15) * f;
+      bBeamMat.opacity = (0.5 + 0.15 * Math.sin(t * 30)) * on; bCoreMat.opacity = 0.6 * on;
+      bSkyCoreMat.opacity = (0.6 + 0.12 * Math.sin(t * 41)) * on; bSkyGlowMat.opacity = (0.22 + 0.08 * Math.sin(t * 23)) * on;
+      for (const fl of bFlames) {
+        const u = fl.userData, k = (t * 1.7 + u.ph) % 1, s = u.s * (0.5 + k) * on;   // each burst grows, rises and fades, then repeats
+        fl.scale.set(s, s * 1.3, 1); fl.position.set(u.x, s * 0.55 + k * 0.8, u.z); fl.material.opacity = (1 - k) * on;
+      }
+    }
+  }
   safeBox.visible = isB && !!S.found;
   if (safeBox.visible) { const xy = sqXY(Math.floor(S.safe / BG.grid), S.safe % BG.grid); safeBox.position.set(xy[0], 0, xy[1]); }
   for (let i = 0; i < 2; i++) {
@@ -620,11 +883,37 @@ function sync() {
     u.core.visible = u.halo.visible = up; u.core.position.y = u.halo.position.y = h;
     u.halo.scale.setScalar(1 + 0.06 * Math.sin(t * 9 + i));
   }
+  // meteor: comes down over the middle (speeding up) during the last seconds of the cast, hits as it ends
+  const MT = isB ? S.trialEnd - BG.meteor.lead : 1e9, after = isB ? t - S.trialEnd : -1;
+  meteor.visible = t >= MT && after < 0.8;
+  if (meteor.visible) {
+    const M = BG.meteor, k = clamp((t - MT) / M.lead, 0, 1), hit = after >= 0;
+    const a = clamp((t - MT) / M.arrive, 0, 1), ae = 1 - (1 - a) * (1 - a), d = clamp((t - MT - M.arrive) / (M.lead - M.arrive), 0, 1);
+    meteorBody.visible = after < 0.3;
+    // flies in from high in the north, hangs over the middle, then drops faster and faster onto the board
+    if (a < 1) meteorBody.position.set(0, 48 + (M.height - 48) * ae, -40 * (1 - ae));
+    else meteorBody.position.set(0, M.height + (MR * 0.6 - M.height) * d * d * d, 0);
+    meteorBody.rotation.set(t * 0.25, t * 0.6, 0);
+    meteorBody.scale.setScalar(hit ? 1 + after * 2.5 : 0.75 + 0.25 * k);
+    meteorBall.material.opacity = hit ? 0.92 * Math.max(0, 1 - after / 0.3) : Math.min(0.92, k * 5);
+    meteorGlowMat.opacity = (0.3 + 0.1 * Math.sin(t * 14)) * (hit ? Math.max(0, 1 - after / 0.3) : Math.min(1, k * 5));
+    meteorMark.visible = !hit; meteorMark.scale.setScalar(0.2 + 0.8 * k); meteorMarkMat.opacity = 0.12 + 0.22 * k + 0.06 * Math.sin(t * 12);
+    meteorRing.visible = hit; if (hit) { meteorRing.scale.setScalar(2 + after * 55); meteorRingMat.opacity = 0.9 * (1 - after / 0.8); }
+  }
   const me = isB ? S.actors.find((a) => a.me) : null, ks = isB ? snapsPassed(t) : 0;
   let tgt = null;
   if (me && opts.callouts && S.phase === 'run') {
     const myOrb = me.orb != null ? S.orbs[me.orb] : null;
-    if (myOrb && !myOrb.grabbed && !myOrb.landed && (ks >= 2 || S.found)) tgt = [myOrb.x, myOrb.y];
+    if (myOrb && !myOrb.grabbed && !myOrb.landed && (ks >= 2 || S.found)) {
+      tgt = orbTarget(myOrb, t);
+      // if your own red circle sits on that spot, wait just outside it until it resolves
+      const wi = S.waves.findIndex((w) => t >= w.tSnap && !w.done), c = wi >= 0 ? me.circ[wi] : null;
+      if (c && Math.hypot(tgt[0] - c.x, tgt[1] - c.y) < BG.radius + 0.6) {
+        let ux = P.x - c.x, uy = P.y - c.y, l = Math.hypot(ux, uy);
+        if (l < 0.05) { ux = -c.x; uy = -c.y; l = Math.hypot(ux, uy) || 1; }
+        tgt = [c.x + ux / l * (BG.radius + 0.8), c.y + uy / l * (BG.radius + 0.8)];
+      }
+    }
     else if (!S.found && ks < S.waves.length && me.path[ks].tile >= 0) tgt = me.path[ks].xy;
   }
   target.visible = !!tgt;
@@ -632,6 +921,11 @@ function sync() {
   // the arrow points at that target, or at the safe square once it's found
   let aim = tgt;
   if (!aim && me && opts.callouts && S.phase === 'run' && S.found && tileAt(P.x, P.y) !== S.safe) aim = sqXY(Math.floor(S.safe / BG.grid), S.safe % BG.grid);
+  // during the breath, if your square is in its path, point at that square's safe far corner
+  cornerMark.visible = false;
+  if (aim && breathWindow(t) && inBreath(aim[0], aim[1]) && tileAt(aim[0], aim[1]) >= 0 && !(S.found && tileAt(aim[0], aim[1]) === S.safe)) {
+    aim = breathCorner(tileAt(aim[0], aim[1])); cornerMark.visible = true; cornerMark.position.set(aim[0], 0, aim[1]);
+  }
   arrow.visible = false;
   if (aim) {
     const dx = aim[0] - P.x, dz = aim[1] - P.y, l = Math.hypot(dx, dz);
@@ -642,9 +936,14 @@ function sync() {
   let bi = 0;
   for (let i = 0; i < actorCircles.length; i++) {
     const v = actorCircles[i], a = isB ? S.actors[i] : null;
-    if (a && !a.me) { const m = bots[bi++]; m.visible = true; m.material = botMat[a.role]; m.position.set(a.x, 0.9 + (a.z || 0), a.y); }
+    if (a && !a.me) {
+      const m = bots[bi], tag = tags[bi++], down = !!a.dead && t >= a.dead; m.visible = tag.visible = true;
+      m.material = down ? botDeadMat : botMat[a.role]; m.position.set(a.x, down ? 0.45 : 0.9 + (a.z || 0), a.y); m.rotation.set(0, 0, down ? Math.PI / 2 : 0);   // fallen teammates lie down, greyed out
+      if (tag.userData.name !== a.name) { tag.userData.name = a.name; tag.material.map = nameTag(a.name); tag.material.needsUpdate = true; }
+      tag.position.set(a.x, (down ? 1.3 : 2.35) + (a.z || 0), a.y); tag.material.opacity = down ? 0.45 : 1;
+    }
     const w = a && wi >= 0 ? S.waves[wi] : null, c = w ? a.circ[wi] : null, k = w ? (t - w.t0) / (w.t1 - w.t0) : -1;
-    v.g.visible = k >= 0 && k <= 1.15;
+    v.g.visible = k >= 0 && k <= 1.15 && !c.none;
     if (!v.g.visible) continue;
     if (c.snapped || w.done) v.g.position.set(c.x, 0, c.y); else v.g.position.set(a.me ? P.x : a.x, 0, a.me ? P.y : a.y);
     v.fill.scale.setScalar(Math.max(0.001, Math.min(1, k)));
@@ -652,7 +951,7 @@ function sync() {
     v.baseMat.opacity = k >= 1 ? 0.9 * (1 - (k - 1) / 0.15) : c.snapped ? 0.22 + 0.12 * Math.sin(t * 40) : 0.16;
     v.ring.visible = v.fill.visible = k < 1;
   }
-  for (; bi < bots.length; bi++) bots[bi].visible = false;
+  for (; bi < bots.length; bi++) bots[bi].visible = tags[bi].visible = false;
   // third-person orbit camera
   const cp = Math.cos(cam.pitch), ty = 1.5;
   camera.position.set(P.x + Math.sin(cam.yaw) * cam.dist * cp, Math.max(0.35, ty + cam.dist * Math.sin(cam.pitch)), P.y + Math.cos(cam.yaw) * cam.dist * cp);
@@ -676,7 +975,10 @@ function hud() {
   setText(info, (bingo ? 'BINGO BOARD  ·  ' + S.who : S.hard ? 'HARD' : 'NORMAL') + '  ·  ' + (n ? what + n + ' / ' + total : 'Get ready') + (opts.keep ? '  ·  Mistakes: ' + S.fails.length : ''));
   const again = 'R or Enter to retry  ·  Esc for settings', found = bingo && S.found ? 'Safe square found by ' + S.found.by + '.\n' : '';
   if (S.phase === 'dead') { setText(call, 'YOU DIED', 'bad'); setText(sub, S.fails.join('\n') + '\n' + again); }
-  else if (S.phase === 'clear') { setText(call, 'CLEARED', 'ok'); setText(sub, found + 'No mistakes.\n' + again); }
+  else if (S.phase === 'clear') {
+    const missNote = bingo && S.missed.length ? 'Your circle missed your square on circle ' + S.missed.map((m) => m.wave).join(', ') + ". It wasn't the safe square, so it didn't cost the team this time.\n" : 'No mistakes.\n';
+    setText(call, 'CLEARED', 'ok'); setText(sub, found + missNote + again);
+  }
   else if (S.phase === 'done') { setText(call, S.fails.length + (S.fails.length > 1 ? ' MISTAKES' : ' MISTAKE'), 'bad'); setText(sub, S.fails.join('\n') + '\n' + again); }
   else if (opts.callouts && bingo) {
     const B = CFG.bingo, w = S.waves.find((q) => t >= q.t0 && !q.done), wi = S.waves.indexOf(w), held = w && t < w.tSnap, last = w && w.n === S.waves.length;
@@ -685,17 +987,42 @@ function hud() {
     const inMyCircle = !!w && !held && Math.hypot(S.p.x - me.circ[wi].x, S.p.y - me.circ[wi].y) < B.radius;
     let main = '', cls = '';
     const lines = [];
-    if (myOrb && !myOrb.grabbed && !myOrb.landed && (ks >= 2 || S.found)) {
+    const sqTarget = !S.found && ks < S.waves.length && me.path[ks].tile >= 0 ? me.path[ks].xy : null;
+    const breathNow = breathWindow(t) && !inside, coming = t < S.breath.start;
+    if (breathWindow(t)) lines.push('Breath from the ' + ['', 'south-west', 'north-west', 'north-east', 'south-east'][S.breath.v] + ' corner' + (inside ? ": you're safe in here" : ''));
+    const onOrb = !!myOrb && !myOrb.grabbed && !myOrb.landed, safeC = sqXY(Math.floor(S.safe / B.grid), S.safe % B.grid);
+    // found, and you can be inside before the breath starts: just go
+    const beatIt = !!S.found && !inside && !onOrb && (breathNow || breathSoon(t)) && coming
+      && Math.hypot(safeC[0] - S.p.x, safeC[1] - S.p.y) / CFG.player.speed < S.breath.start - t - 0.15;
+    if (beatIt) {
+      main = 'BREATH: RUN IN NOW'; cls = 'in'; lines.push('You can make it before the breath starts');
+    } else if (breathNow && inBreath(S.p.x, S.p.y)) {
+      main = !coming ? 'BREATH: GET OUT OF IT' : S.found ? 'BREATH: STEP OUT OF THE ORANGE' : 'BREATH: GO TO THE FAR CORNER'; cls = 'bad';
+    } else if (breathNow && sqTarget && inBreath(sqTarget[0], sqTarget[1])) {
+      main = 'BREATH: HOLD THE FAR CORNER'; cls = 'out';
+    } else if (breathNow && S.found && !(myOrb && !myOrb.grabbed && !myOrb.landed) && breathOnPath(S.p.x, S.p.y, ...sqXY(Math.floor(S.safe / B.grid), S.safe % B.grid))) {
+      main = "BREATH: DON'T CROSS IT YET"; cls = 'out'; lines.push('Go to the safe square once the breath ends');
+    } else if (breathSoon(t) && S.found && !inside && !(myOrb && !myOrb.grabbed && !myOrb.landed)) {
+      main = "BREATH SOON: DON'T CUT THROUGH THE MIDDLE"; cls = 'out';
+    } else if (myOrb && !myOrb.grabbed && !myOrb.landed && (ks >= 2 || S.found)) {
       if (inMyCircle) { main = 'GET OUT OF YOUR CIRCLE'; cls = 'bad'; }
-      else if (t < B.orb.spawn) { main = 'GO TO YOUR ORB'; cls = 'out'; }
+      else if (t < S.waves[2].tSnap) { main = 'DROP YOUR CIRCLE BESIDE THE ORB'; cls = 'out'; }
       else if (!orbReachable(t, CFG.jump.height)) { main = 'WAIT: ORB TOO HIGH'; cls = 'out'; }
       else { main = 'JUMP INTO THE ORB (SPACE)'; cls = 'in'; }
     } else if (S.found) {
-      main = inside ? 'SAFE: STAY INSIDE' : 'RUN TO THE SAFE SQUARE'; cls = inside ? 'ok' : 'in';
-      if (inMyCircle && !inside) lines.push('Your circle is red: get out of it on the way');
+      const live = liveCircles(t), sx = sqXY(Math.floor(S.safe / B.grid), S.safe % B.grid);
+      const redOnPath = !inside && [0.25, 0.5, 0.75, 1].some((k) => { const x = S.p.x + (sx[0] - S.p.x) * k, y = S.p.y + (sx[1] - S.p.y) * k; return tileAt(x, y) !== S.safe && inCircles(live, x, y); });
+      const falling = t >= S.trialEnd - B.meteor.lead && t < S.trialEnd;
+      if (!inside && inCircles(live, S.p.x, S.p.y)) { main = 'GET OUT OF THE RED CIRCLE'; cls = 'bad'; }
+      else if (!inside && falling) { main = 'METEOR: GET IN THE SAFE SQUARE'; cls = 'bad'; }
+      else { main = inside ? 'SAFE: STAY INSIDE' : 'RUN TO THE SAFE SQUARE'; cls = inside ? 'ok' : 'in'; }
+      if (falling) lines.push('Meteor incoming: it kills everyone outside the safe square');
+      if (redOnPath) lines.push("Red circles on the way: go around or wait for them to pop");
     } else if (w) { main = held ? 'HOLD YOUR SQUARE' : last ? 'GET OUT' : 'NEXT SQUARE'; cls = held ? 'out' : 'bad'; }
     if (S.found) lines.unshift('Safe square found by ' + S.found.by);
     if (t >= B.orb.mark) lines.push('Orbs grabbed: ' + S.orbs.filter((o) => o.grabbed).length + ' / 2');
+    const lastMiss = S.missed[S.missed.length - 1];
+    if (lastMiss && t - lastMiss.t < 3) lines.push('Circle ' + lastMiss.wave + ': your circle missed your square' + (S.found ? '' : ' (if it was the safe one, nobody will find it)'));
     setText(call, main, cls); setText(sub, lines.join('\n'));
   }
   else if (opts.callouts) {
