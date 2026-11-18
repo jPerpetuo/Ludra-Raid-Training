@@ -4,29 +4,30 @@ A free 3D practice tool for the **"Zikel" mechanic of Ludra**, the boss of the S
 orange lines, the laser walls and the hard-mode circles with a real third-person camera, at full or reduced speed,
 as many times as you like.
 
+## ▶ [Click here to play](https://mtkkk.github.io/Ludra-Raid-Training/)
+
+**That's all you need to do: click the link above.** The trainer opens in your web browser and you can start right
+away. Nothing to download, nothing to install, no account needed.
+
+Link to share: **https://mtkkk.github.io/Ludra-Raid-Training/**
+
+Use a computer with a keyboard and mouse, in Chrome, Edge or Firefox.
+
 > **Unofficial fan project.** Made by players, for players. Not affiliated with, endorsed by or connected to NCSOFT.
 > AION is a trademark of NCSOFT. No game files, art or sounds are used: everything you see is drawn with simple
 > original shapes.
 
-## How to play
+## Want your own copy instead? (optional)
 
-### In your browser (no download)
-
-**[▶ Play Ludra Raid Training](https://mtkkk.github.io/Ludra-Raid-Training/)**
-
-Click the link and the trainer opens in your browser. Use a computer with a keyboard and mouse, in Chrome, Edge or
-Firefox. Nothing to install and no account needed.
-
-### Or download it to keep a copy
-
-You only need **one file**: `ludra-raid-training.html`.
+You don't need this to play: the link at the top is enough. Download only if you want to keep the file on your
+computer. You only need **one file**: `ludra-raid-training.html`.
 
 **[⬇ Download ludra-raid-training.html](https://github.com/mtkkk/Ludra-Raid-Training/releases/latest/download/ludra-raid-training.html)**
 
 Click the link above, then double-click the downloaded file in your Downloads folder. It opens in your browser and
 the trainer starts. This link always gives you the newest version.
 
-#### Or from the file page
+### Or from the file page
 
 1. **Open the file page:** click **[ludra-raid-training.html](ludra-raid-training.html)**. You'll see a page full of
    code. That's normal, you don't need to read it.
