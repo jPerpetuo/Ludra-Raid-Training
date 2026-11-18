@@ -8,18 +8,25 @@ as many times as you like.
 > AION is a trademark of NCSOFT. No game files, art or sounds are used: everything you see is drawn with simple
 > original shapes.
 
-## How to download and play
+## How to play
 
-You only need **one file**: `ludra-raid-training.html`. There is nothing to install and no account needed.
+### In your browser (no download)
 
-### Quickest way
+**[▶ Play Ludra Raid Training](https://mtkkk.github.io/Ludra-Raid-Training/)**
+
+Click the link and the trainer opens in your browser. Use a computer with a keyboard and mouse, in Chrome, Edge or
+Firefox. Nothing to install and no account needed.
+
+### Or download it to keep a copy
+
+You only need **one file**: `ludra-raid-training.html`.
 
 **[⬇ Download ludra-raid-training.html](https://github.com/mtkkk/Ludra-Raid-Training/releases/latest/download/ludra-raid-training.html)**
 
 Click the link above, then double-click the downloaded file in your Downloads folder. It opens in your browser and
 the trainer starts. This link always gives you the newest version.
 
-### Or from the file page
+#### Or from the file page
 
 1. **Open the file page:** click **[ludra-raid-training.html](ludra-raid-training.html)**. You'll see a page full of
    code. That's normal, you don't need to read it.
@@ -78,6 +85,7 @@ Anyone can use this tool, share it with their static or legion, and improve on i
 | `ludra-raid-training.html` | The trainer: one self-contained page |
 | `ludra-zikel-mechanic.md` | Mechanic reference: rules, timings, sources, open questions |
 | `PROGRESS.md` | Development notes |
+| `index.html` | Sends the website address straight to the trainer |
 | `docs/` | Images for this README |
 | `LICENSE` | MIT license |
 
