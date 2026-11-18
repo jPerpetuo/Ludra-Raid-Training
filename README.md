@@ -12,6 +12,15 @@ as many times as you like.
 
 You only need **one file**: `ludra-raid-training.html`. There is nothing to install and no account needed.
 
+### Quickest way
+
+**[⬇ Download ludra-raid-training.html](https://github.com/mtkkk/Ludra-Raid-Training/releases/latest/download/ludra-raid-training.html)**
+
+Click the link above, then double-click the downloaded file in your Downloads folder. It opens in your browser and
+the trainer starts. This link always gives you the newest version.
+
+### Or from the file page
+
 1. **Open the file page:** click **[ludra-raid-training.html](ludra-raid-training.html)**. You'll see a page full of
    code. That's normal, you don't need to read it.
 2. **Find the download button:** click the **`···`** button at the **top right** of that page.
