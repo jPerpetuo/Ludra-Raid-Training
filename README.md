@@ -8,13 +8,27 @@ as many times as you like.
 > AION is a trademark of NCSOFT. No game files, art or sounds are used: everything you see is drawn with simple
 > original shapes.
 
-## How to use it
+## How to download and play
 
-1. Open [`ludra-raid-training.html`](ludra-raid-training.html) on this page.
-2. Click the **Download raw file** button (the download arrow at the top right of the file view).
-3. Double-click the downloaded file. It opens in your browser (Chrome, Edge or Firefox).
+You only need **one file**: `ludra-raid-training.html`. There is nothing to install and no account needed.
 
-There is nothing to install. You need an internet connection, because the page loads its 3D library when it opens.
+1. **Open the file page:** click **[ludra-raid-training.html](ludra-raid-training.html)**. You'll see a page full of
+   code. That's normal, you don't need to read it.
+2. **Find the download button:** click the **`···`** button at the **top right** of that page.
+3. **Click "Download".** The file saves to your Downloads folder.
+
+   ![Click the ··· button at the top right of the file page, then click Download](docs/how-to-download.png)
+
+4. **Open it:** go to your Downloads folder and double-click `ludra-raid-training.html`. It opens in your web
+   browser and the trainer starts.
+
+If it opens in a different program instead (like Notepad), right-click the file, choose **Open with**, and pick
+**Chrome**, **Edge** or **Firefox**.
+
+You need an internet connection while playing, because the page loads its 3D library when it opens.
+
+> The green **Code** button → **Download ZIP** on the main page also works, but it downloads the whole project as a
+> ZIP that you have to unzip first. The steps above are simpler.
 
 ## Controls
 
@@ -55,6 +69,7 @@ Anyone can use this tool, share it with their static or legion, and improve on i
 | `ludra-raid-training.html` | The trainer: one self-contained page |
 | `ludra-zikel-mechanic.md` | Mechanic reference: rules, timings, sources, open questions |
 | `PROGRESS.md` | Development notes |
+| `docs/` | Images for this README |
 | `LICENSE` | MIT license |
 
 ## License
