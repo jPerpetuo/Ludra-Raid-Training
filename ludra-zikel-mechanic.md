@@ -39,13 +39,13 @@ The order, angles and laser directions are the same every time (Confirmed).
 
 | # | Orange line runs | Laser wall comes from (and sweeps toward) |
 |---|---|---|
-| 1 | East ↔ West, through the centre | South → North |
+| 1 | East ↔ West, through the center | South → North |
 | 2 | South-west ↔ North-east (diagonal) | West → East |
-| 3 | North ↔ South, through the centre | East → West |
+| 3 | North ↔ South, through the center | East → West |
 | 4 | North-west ↔ South-east (diagonal) | North → South |
 
 Lines 1 and 3 run through the middle of the room (Confirmed). The diagonals are assumed to run corner to corner
-through the centre (Estimate).
+through the center (Estimate).
 
 ## The line (each of the 4)
 
@@ -105,7 +105,7 @@ strikes (+4.0 s). Players dodge it while leaving the old line and stepping onto 
 |---|---|
 | Beams per row | 8–10 seen across one wall |
 | Beam spacing | ~5 m (trainer value) |
-| Gap position | Unknown whether the room's centre is a beam or a gap |
+| Gap position | Unknown whether the room's center is a beam or a gap |
 
 ## Hard-mode orange circle
 
@@ -115,7 +115,7 @@ strikes (+4.0 s). Players dodge it while leaving the old line and stepping onto 
 - An orange circle appears under a player's feet and fills up.
 - When it **finishes filling**, you must be **outside it** or **perfect dodge**; otherwise you die.
 
-### Behaviour (Measured)
+### Behavior (Measured)
 
 - Every player gets their own circle at the same time (3+ circles seen at once).
 - The circle **stays where it dropped**; it does not follow the player.
@@ -189,10 +189,10 @@ Relative to the strike (0.0 s). All measured except where marked.
     "widthMeters": { "estimate": 4 }
   },
   "sequence": [
-    { "line": "E-W",   "throughCentre": true, "laserFrom": "S", "laserTo": "N" },
-    { "line": "SW-NE", "throughCentre": true, "laserFrom": "W", "laserTo": "E" },
-    { "line": "N-S",   "throughCentre": true, "laserFrom": "E", "laserTo": "W" },
-    { "line": "NW-SE", "throughCentre": true, "laserFrom": "N", "laserTo": "S" }
+    { "line": "E-W",   "throughCenter": true, "laserFrom": "S", "laserTo": "N" },
+    { "line": "SW-NE", "throughCenter": true, "laserFrom": "W", "laserTo": "E" },
+    { "line": "N-S",   "throughCenter": true, "laserFrom": "E", "laserTo": "W" },
+    { "line": "NW-SE", "throughCenter": true, "laserFrom": "N", "laserTo": "S" }
   ],
   "laser": {
     "lethal": true,
@@ -218,7 +218,7 @@ Relative to the strike (0.0 s). All measured except where marked.
 
 1. Laser timing comes from one sweep. Still open: whether the sweep start is tied to the line strike or to the
    hard-mode circle resolving (the circle's drop time varies), and whether normal mode uses the same timing.
-2. Laser beam count, spacing, and whether the room's centre is a beam or a gap.
+2. Laser beam count, spacing, and whether the room's center is a beam or a gap.
 3. Whether another player's hard-mode circle can kill you.
 4. Real arena size, line width and circle radius.
 5. Time from Ludra flying back to the first orange line.

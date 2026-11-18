@@ -1,6 +1,6 @@
 # Ludra Raid Training
 
-A free 3D practice tool for **Ludra**, the boss of the Sanctuary raid in AION 2. Practise two of her mechanics with a
+A free 3D practice tool for **Ludra**, the boss of the Sanctuary raid in AION 2. Practice two of her mechanics with a
 real third-person camera, at full or reduced speed, as many times as you like:
 
 - **Zikel:** the orange lines, the laser walls and the hard-mode circles.
@@ -74,7 +74,7 @@ detonates. Between lines, a wall of lasers sweeps across the room: stand in a ga
 drops under your feet; be out of it (or perfect dodge) when it fills.
 
 **Bingo board.** A 6 × 6 board appears and a circle follows every player four times; each one fills the square it
-lands on. Pick your corner and role (outside, inside, or centre for the orbs) and sweep your squares with the team
+lands on. Pick your corner and role (outside, inside, or center for the orbs) and sweep your squares with the team
 until someone finds the hidden safe square, then everyone runs inside it: it makes you immune. Twice, Ludra flies to
 a corner and breathes across the board along the diagonal; hold the far corner of your square or wait at the edge.
 When "Ludra's Trial" ends, a meteor kills everyone outside the safe square.

@@ -73,7 +73,7 @@
 </div>
 <div id="menu">
   <div class="wrap">
-    <header class="mhead"><h1>Ludra Raid Training</h1><div class="sub">Sanctuary raid · pick a mechanic to practise</div><div class="credit">by <b>mtkです</b> [Siel] · South America</div><div id="err"></div></header>
+    <header class="mhead"><h1>Ludra Raid Training</h1><div class="sub">Sanctuary raid · pick a mechanic to practice</div><div class="credit">by <b>mtkです</b> [Siel] · South America</div><div id="err"></div></header>
     <div class="row" id="resumeRow"><button id="resume">Resume</button></div>
     <div class="cards">
       <section class="card" id="cardZikel">
@@ -89,7 +89,7 @@
       <section class="card" id="cardBingo">
         <div><h2>Bingo board</h2><div class="sub">Sweep the board with your team · find the safe square</div></div>
         <div><div class="label">Your corner</div><div class="seg" id="bCorner"><button data-v="1">1 · SW</button><button data-v="2">2 · NW</button><button data-v="3">3 · NE</button><button data-v="4">4 · SE</button></div></div>
-        <div><div class="label">Your role</div><div class="seg" id="bRole"><button data-v="outside">Outside</button><button data-v="inside">Inside</button><button data-v="centre">Centre (orb)</button></div></div>
+        <div><div class="label">Your role</div><div class="seg" id="bRole"><button data-v="outside">Outside</button><button data-v="inside">Inside</button><button data-v="center">Center (orb)</button></div></div>
         <div><div id="bMini" class="mini"></div><div class="note mini-cap" id="bMiniCap"></div></div>
         <div class="row"><button id="goBingo" class="go">Start</button></div>
         <div><div class="label">How it works</div>
@@ -99,7 +99,7 @@
           <div><span class="dot" style="background:var(--cyan)"></span>Then everyone runs into it: inside you take no damage</div>
           <div><span class="dot" style="background:var(--bad)"></span>When Ludra's Trial ends, anyone outside it dies</div>
           <div><span class="dot" style="background:var(--ok)"></span>Avoid everyone's circles · perfect dodge works at the end</div>
-          <div><span class="dot" style="background:#4a8dff"></span>Centre: jump into your orb (Space) before it lands</div></div>
+          <div><span class="dot" style="background:#4a8dff"></span>Center: jump into your orb (Space) before it lands</div></div>
         <div class="note">Phase 1 board. Your 9 teammates are bots.</div>
       </section>
     </div>
@@ -121,7 +121,7 @@
 import * as THREE from 'three';
 
 // ============================================================================
-// Tuning. Everything about the mechanic lives here. Ludra is north. x = east, y = south, (0,0) = arena centre, metres.
+// Tuning. Everything about the mechanic lives here. Ludra is north. x = east, y = south, (0,0) = arena center, meters.
 // ============================================================================
 const CFG = {
   arenaSize: 40,
@@ -150,7 +150,7 @@ const CFG = {
   // moving ~20 frames after the hard circle resolves (~2.9 s after the strike), crosses in ~150 frames (2.5 s).
   laser: { spacing: 5, radius: 1.1, afterStrike: 1.25, hold: 1.65, travel: 2.5 },
   // sweeps[i] = laser rows that follow line i. from = compass bearing the row comes from (0 N, 90 E, 180 S, 270 W).
-  // phase 0 = a beam crosses the centre, 0.5 = the centre is a gap.
+  // phase 0 = a beam crosses the center, 0.5 = the center is a gap.
   sweeps: [
     [{ from: 180, phase: 0 }],
     [{ from: 270, phase: 0 }],
@@ -165,7 +165,7 @@ const CFG = {
   // stays put and resolves 2.17 s (65 steps) after it appeared; the next one forms ~60 steps (2.0 s) later. 4 in a
   // row. Square size and circle radius are estimates.
   // Squares are [row, col]: row 0 = north edge (Ludra), col 0 = west edge. Corners: 1 = SW, 2 = NW, 3 = NE, 4 = SE.
-  // Common solve: each corner pair sweeps clockwise, 2 squares per circle; 2 centre players cover the middle 4
+  // Common solve: each corner pair sweeps clockwise, 2 squares per circle; 2 center players cover the middle 4
   // squares, then walk out to the orbs.
   // Phase 1 board (boss near 50%). Once a circle lands on the safe square, anyone standing in it is immune; when
   // "Ludra's Trial" ends, everyone outside it dies. The cast is 16.0 s and starts just before the first circle
@@ -200,8 +200,8 @@ const CFG = {
       3: { outside: [[0, 5], [1, 5], [2, 5], [3, 5]], inside: [[0, 4], [1, 4], [2, 4], [3, 4]] },
       4: { outside: [[5, 5], [5, 4], [5, 3], [5, 2]], inside: [[4, 5], [4, 4], [4, 3], [4, 2]] },
     },
-    // the centre players cover 2 squares each, then go to the orbs (A to the north or east orb, B to south or west)
-    center: [{ name: 'Centre A', path: [[2, 2], [2, 3]], orb: 0 }, { name: 'Centre B', path: [[3, 3], [3, 2]], orb: 1 }],
+    // the center players cover 2 squares each, then go to the orbs (A to the north or east orb, B to south or west)
+    center: [{ name: 'Center A', path: [[2, 2], [2, 3]], orb: 0 }, { name: 'Center B', path: [[3, 3], [3, 2]], orb: 1 }],
   },
   camera: { distance: 11, pitch: 0.42, minDist: 4, maxDist: 28 },
 };
@@ -216,7 +216,7 @@ const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const keys = new Set();
 const opts = { hard: false, speed: 1, keep: false, sens: 1, callouts: true, mech: 'zikel', bCorner: 1, bRole: 'outside' };
 try { Object.assign(opts, JSON.parse(localStorage.zikelTrainer || '{}')); } catch {}
-if (opts.bRole === 'melee') opts.bRole = 'outside'; else if (opts.bRole === 'ranged') opts.bRole = 'inside';
+if (opts.bRole === 'melee') opts.bRole = 'outside'; else if (opts.bRole === 'ranged') opts.bRole = 'inside'; else if (opts.bRole === 'centre') opts.bRole = 'center';   // older saved settings
 const saveOpts = () => { try { localStorage.zikelTrainer = JSON.stringify(opts); } catch {} };
 const cam = { yaw: 0, pitch: CFG.camera.pitch, dist: CFG.camera.distance };
 const SIDE = { 0: 'north', 90: 'east', 180: 'south', 270: 'west' };
@@ -238,19 +238,19 @@ function newRun(mech) {
     for (let i = 0; i < B.count; i++) { const t0 = B.intro + i * (B.life + B.gap); waves.push({ n: i + 1, t0, tSnap: t0 + B.follow, t1: t0 + B.life, done: false }); }
     const step = (rc) => ({ xy: sqXY(rc[0], rc[1]), tile: rc[0] * B.grid + rc[1] });
     const actor = (name, role, me, path) => ({ name, role, me, path, x: path[0].xy[0], y: path[0].xy[1], circ: waves.map(() => ({ x: 0, y: 0, snapped: false })) });
-    const role = opts.bRole === 'centre' ? 'centre' : opts.bRole === 'inside' ? 'inside' : 'outside';
+    const role = opts.bRole === 'center' ? 'center' : opts.bRole === 'inside' ? 'inside' : 'outside';
     for (const k of [1, 2, 3, 4]) for (const r of ['outside', 'inside']) {
       const me = r === role && k === +opts.bCorner;
       actors.push(actor(me ? 'you' : (r === 'outside' ? 'Outside ' : 'Inside ') + k, r, me, B.paths[k][r].map(step)));
     }
     for (let i = 0; i < 8; i += 2) { actors[i].mate = actors[i + 1]; actors[i + 1].mate = actors[i]; }
     const d = B.orb.dist, axis = Math.random() < 0.5 ? [[0, -d], [0, d]] : [[d, 0], [-d, 0]];   // north + south or east + west
-    // wait = a spot 4 m to the side of the orb (still off the board) where the centre player drops their 3rd circle
+    // wait = a spot 4 m to the side of the orb (still off the board) where the center player drops their 3rd circle
     const orbs = axis.map(([x, y]) => { const l = Math.hypot(x, y); return { x, y, wait: [x - y / l * 4, y + x / l * 4], grabbed: null, landed: false, owner: null }; });
     B.center.forEach((c, ci) => {
-      const me = role === 'centre' && ci === 0, path = c.path.map(step);
+      const me = role === 'center' && ci === 0, path = c.path.map(step);
       while (path.length < B.count) path.push({ xy: axis[c.orb], tile: -1 });
-      const a = actor(me ? 'you' : c.name, 'centre', me, path); a.orb = c.orb; orbs[c.orb].owner = a; actors.push(a);
+      const a = actor(me ? 'you' : c.name, 'center', me, path); a.orb = c.orb; orbs[c.orb].owner = a; actors.push(a);
     });
     actors.forEach((a, i) => { a.z = 0; a.vz = 0; a.spot = [Math.cos(i * 0.63) * 1.1, Math.sin(i * 0.63) * 1.1]; });   // spot = where each stands in the safe square
     // the breath comes from a random vertex (1 SW, 2 NW, 3 NE, 4 SE) along the diagonal through it
@@ -268,7 +268,7 @@ function newRun(mech) {
     const me = actors.find((a) => a.me);
     S = Object.assign(baseState('bingo', [me.x, me.y], B.trialStart + B.trial + 0.8), {
       waves, actors, orbs, breaths, breath: breaths[0], trialEnd: B.trialStart + B.trial, trialDone: false, safe: Math.floor(Math.random() * B.grid * B.grid), found: null, missed: [],
-      who: role === 'centre' ? 'Centre (orb)' : 'Corner ' + opts.bCorner + ' ' + role });
+      who: role === 'center' ? 'Center (orb)' : 'Corner ' + opts.bCorner + ' ' + role });
     return;
   }
   const L = CFG.laser;
@@ -288,7 +288,7 @@ function newRun(mech) {
   S = Object.assign(baseState('zikel', CFG.start, end), { lines, sweeps });
 }
 
-// Bingo: square centre from [row, col], and which square (row-major index) a point is on, or -1 off the board
+// Bingo: square center from [row, col], and which square (row-major index) a point is on, or -1 off the board
 function sqXY(r, c) { const B = CFG.bingo, bh = B.grid * B.tile / 2; return [-bh + (c + 0.5) * B.tile, -bh + (r + 0.5) * B.tile]; }
 function tileAt(x, y) {
   const B = CFG.bingo, bh = B.grid * B.tile / 2, i = Math.floor((x + bh) / B.tile), j = Math.floor((y + bh) / B.tile);
@@ -298,7 +298,7 @@ const snapsPassed = (t) => { let k = 0; for (const w of S.waves) if (t >= w.tSna
 // jump (Space): launch speed and gravity from the peak height and time to peak
 const JV = 2 * CFG.jump.height / CFG.jump.time, JG = 2 * CFG.jump.height / (CFG.jump.time * CFG.jump.time);
 function fall(o, dt) { if (o.z > 0 || o.vz > 0) { o.z += o.vz * dt; o.vz -= JG * dt; if (o.z <= 0) { o.z = 0; o.vz = 0; } } }
-// orb centre height: from `height` at spawn straight down to resting on the ground at `land`
+// orb center height: from `height` at spawn straight down to resting on the ground at `land`
 function orbHeight(t) { const O = CFG.bingo.orb; return O.radius + (O.height - O.radius) * clamp(1 - (t - O.spawn) / (O.land - O.spawn), 0, 1); }
 const orbReachable = (t, z) => z + CFG.bingo.orb.reach >= orbHeight(t) - CFG.bingo.orb.radius;
 // breath: distance from the diagonal, whether a player standing at (x, y) is touched, and the safe far corner of a square
@@ -311,11 +311,11 @@ function makeBreath(v, tm) {
 // starts high over the middle of the board, flies to her spot for each breath, turns to the middle there (the orange
 // line follows her aim) and stays until she flies to the next one
 const LUDRA_HOME = { x: 0, z: -CFG.arenaSize / 2 - 12, yaw: 0 };
-const LUDRA_PERCH_H = -4, LUDRA_CENTRE_H = 7;
+const LUDRA_PERCH_H = -4, LUDRA_CENTER_H = 7;
 function ludraPose(t) {
   const BR = CFG.bingo.breath, turn = BR.turn * Math.PI / 180, ease = (k) => k * k * (3 - 2 * k);
   if (!S || S.mech !== 'bingo') return { x: LUDRA_HOME.x, z: LUDRA_HOME.z, yaw: LUDRA_HOME.yaw, off: 0, h: 0 };
-  let x = 0, z = 0, yaw = 0, off = 0, h = LUDRA_CENTRE_H, prevEnd = null;
+  let x = 0, z = 0, yaw = 0, off = 0, h = LUDRA_CENTER_H, prevEnd = null;
   for (const b of S.breaths) {
     // later flights start as soon as the previous breath ends and take BR.fly
     // (the 1st one drifts slowly from the moment the board appears, landing just before the line shows)
@@ -355,7 +355,7 @@ function breathCorner(tile) {
   for (const sx of [-1, 1]) for (const sy of [-1, 1]) { const p = [c[0] + sx * h, c[1] + sy * h], d = breathDist(p[0], p[1]); if (d > bd) { bd = d; best = p; } }
   return best;
 }
-// where a centre player should be while on orb duty: beside the orb until their 3rd circle snaps (so it drops off
+// where a center player should be while on orb duty: beside the orb until their 3rd circle snaps (so it drops off
 // the orb spot), then under the orb
 const orbTarget = (o, t) => (t < S.waves[2].tSnap ? o.wait : [o.x, o.y]);
 // snapped red circles that are about to resolve, and whether (x, y) is in one of them
@@ -374,8 +374,8 @@ function circleExit(cs, x, y, tg, hot) {
 }
 function bingoStep(t, P, inv, A, dt) {
   const B = CFG.bingo, O = B.orb, k = snapsPassed(t);
-  // bots hold their square until their circle snaps, then walk to the next one. The centre players go to their orb
-  // after 2 squares and jump into it. As soon as the safe square is found everyone runs into it (centre players once
+  // bots hold their square until their circle snaps, then walk to the next one. The center players go to their orb
+  // after 2 squares and jump into it. As soon as the safe square is found everyone runs into it (center players once
   // they have their orb). If it still isn't found after the last snap, the others step out of their circle away
   // from their partner.
   const safeXY = sqXY(Math.floor(S.safe / B.grid), S.safe % B.grid);
@@ -569,7 +569,7 @@ const flat = (color, opacity, extra) => new THREE.MeshBasicMaterial(Object.assig
 const ground = (geo, mat, y, order) => { const m = new THREE.Mesh(geo, mat); m.position.y = y; m.renderOrder = order || 0; return m; };
 const canvasTex = (w, h, paint) => { const c = document.createElement('canvas'); c.width = w; c.height = h; paint(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; };
 
-// floor: grid every metre, heavier every 5 m, compass letters (top of the texture = north)
+// floor: grid every meter, heavier every 5 m, compass letters (top of the texture = north)
 const floorTex = canvasTex(1024, 1024, (g, w) => {
   const u = w / CFG.arenaSize;
   g.fillStyle = '#131722'; g.fillRect(0, 0, w, w);
@@ -767,9 +767,9 @@ const arrow = new THREE.Group(); arrow.visible = false; scene.add(arrow);
   s.moveTo(0, 0.55); s.lineTo(0.42, 0); s.lineTo(0.15, 0); s.lineTo(0.15, -0.5); s.lineTo(-0.15, -0.5); s.lineTo(-0.15, 0); s.lineTo(-0.42, 0); s.closePath();
   const m = new THREE.Mesh(new THREE.ShapeGeometry(s).rotateX(-Math.PI / 2), flat(0x3ee0b0, 0.95)); m.position.y = 0.09; m.renderOrder = 7; arrow.add(m);   // tip points along -z
 }
-// teammates (bots): outside orange, inside blue, centre purple
+// teammates (bots): outside orange, inside blue, center purple
 const MAXA = 10;
-const botMat = { outside: new THREE.MeshStandardMaterial({ color: 0xff8f6b, roughness: 0.6 }), inside: new THREE.MeshStandardMaterial({ color: 0x6bb8ff, roughness: 0.6 }), centre: new THREE.MeshStandardMaterial({ color: 0xb48cff, roughness: 0.6 }) };
+const botMat = { outside: new THREE.MeshStandardMaterial({ color: 0xff8f6b, roughness: 0.6 }), inside: new THREE.MeshStandardMaterial({ color: 0x6bb8ff, roughness: 0.6 }), center: new THREE.MeshStandardMaterial({ color: 0xb48cff, roughness: 0.6 }) };
 const botGeo = new THREE.CapsuleGeometry(0.42, 0.95, 4, 10), botDeadMat = new THREE.MeshStandardMaterial({ color: 0x5a5e6a, roughness: 0.9 });
 const bots = Array.from({ length: MAXA }, () => { const m = new THREE.Mesh(botGeo, botMat.outside); m.visible = false; scene.add(m); return m; });
 // name tags above the teammates (one texture per name, made once)
@@ -938,7 +938,7 @@ function sync() {
     const v = actorCircles[i], a = isB ? S.actors[i] : null;
     if (a && !a.me) {
       const m = bots[bi], tag = tags[bi++], down = !!a.dead && t >= a.dead; m.visible = tag.visible = true;
-      m.material = down ? botDeadMat : botMat[a.role]; m.position.set(a.x, down ? 0.45 : 0.9 + (a.z || 0), a.y); m.rotation.set(0, 0, down ? Math.PI / 2 : 0);   // fallen teammates lie down, greyed out
+      m.material = down ? botDeadMat : botMat[a.role]; m.position.set(a.x, down ? 0.45 : 0.9 + (a.z || 0), a.y); m.rotation.set(0, 0, down ? Math.PI / 2 : 0);   // fallen teammates lie down, grayed out
       if (tag.userData.name !== a.name) { tag.userData.name = a.name; tag.material.map = nameTag(a.name); tag.material.needsUpdate = true; }
       tag.position.set(a.x, (down ? 1.3 : 2.35) + (a.z || 0), a.y); tag.material.opacity = down ? 0.45 : 1;
     }
@@ -1089,10 +1089,10 @@ function syncUI() {
   $('goBingo').textContent = S && S.mech === 'bingo' ? 'Restart' : 'Start';
   for (const b of $('bCorner').children) b.classList.toggle('on', +b.dataset.v === +opts.bCorner);
   for (const b of $('bRole').children) b.classList.toggle('on', b.dataset.v === opts.bRole);
-  const centre = opts.bRole === 'centre', P2 = CFG.bingo.paths[opts.bCorner];
-  $('bCorner').classList.toggle('dim', centre);
-  const mine = centre ? CFG.bingo.center[0].path : P2[opts.bRole], mate = centre ? CFG.bingo.center[1].path : P2[opts.bRole === 'outside' ? 'inside' : 'outside'];
-  setText($('bMiniCap'), centre ? 'North (Ludra) is up · green: your 2 squares, then your orb (north or east) · blue: the other centre player'
+  const center = opts.bRole === 'center', P2 = CFG.bingo.paths[opts.bCorner];
+  $('bCorner').classList.toggle('dim', center);
+  const mine = center ? CFG.bingo.center[0].path : P2[opts.bRole], mate = center ? CFG.bingo.center[1].path : P2[opts.bRole === 'outside' ? 'inside' : 'outside'];
+  setText($('bMiniCap'), center ? 'North (Ludra) is up · green: your 2 squares, then your orb (north or east) · blue: the other center player'
     : 'North (Ludra) is up · green: your squares in order · blue: your partner');
   let h = '';
   for (let r = 0; r < CFG.bingo.grid; r++) for (let c = 0; c < CFG.bingo.grid; c++) {

@@ -31,7 +31,7 @@ directory listing at `/` because the file is no longer `index.html`; rename or a
   moves, starts sweeping ~20 frames after the hard circle resolves (~strike +2.9 s), crosses in ~150 frames (2.5 s);
   far-wall arrival frame-checked at 4:39.92. Wrong earlier versions: 0.7 s crossing; "stands 1 s, moves at next strike".
   User played it and confirmed the sweep feels right (2026-11-17).
-- Sizes: 40 m arena, 4 m line width, 3 m circle, beams 5 m apart with one crossing dead centre.
+- Sizes: 40 m arena, 4 m line width, 3 m circle, beams 5 m apart with one crossing dead center.
 - Hard-mode circle, measured on 3 circles in the 60 fps video: appears 0.71 / 0.98 / 1.33 s after the strike
   (not fixed), stays where it dropped, resolves 1.82-1.88 s later (0.6-1.3 s after the detonation). Trainer uses
   a random 0.7-1.35 s delay and a 1.85 s fill. Watch out: the floor's round platforms have orange rims too. Dodge only saves from the circle.
@@ -49,17 +49,17 @@ directory listing at `/` because the file is no longer `index.html`; rename or a
   found; "Ludra's Trial" (16 s cast from ~4.0 s, ends ~20 s, confirmed) kills anyone outside. Two orbs, opposite
   sides, random N+S or W+E: shown only. Full plan clears 284/288 (all corners/roles x all safe squares); the 4 misses
   are last-circle finds out of reach, which the user confirmed happens in the game.
-- Roles are Outside / Inside (was melee/ranged) or Centre (= Centre A). Jump on Space (CFG.jump). Orbs: red
+- Roles are Outside / Inside (was melee/ranged) or Center (= Center A). Jump on Space (CFG.jump). Orbs: red
   marker, orb appears high and floats down (CFG.bingo.orb); grab by touching it (jump helps), lose it if it lands.
-  Centre player clears 131/144 in tests (5 unreachable, 8 ran into others' circles at the safe square).
+  Center player clears 131/144 in tests (5 unreachable, 8 ran into others' circles at the safe square).
 - Small green ground arrow next to the player points at the next square / orb / safe square (callouts on).
-- Done 2026-11-19: centre players wait 4 m beside the orb (`orb.wait`, off the board) so their 3rd circle drops
+- Done 2026-11-19: center players wait 4 m beside the orb (`orb.wait`, off the board) so their 3rd circle drops
   there, step out, then go under the orb (`orbTarget()`); the 4th circle also drops beside it if the safe square
   isn't found yet. All NPCs wait just outside their own red circle until it resolves (0 NPCs caught in their own
-  circle across all test runs). The player's outline/arrow/callouts guide Centre the same way.
+  circle across all test runs). The player's outline/arrow/callouts guide Center the same way.
 - NPC names: `mtkです` (the user, always present) plus 8 random names from `GUILD` (the user's guildmates), shown
   as name tags and used in messages.
-- Tests: corner roles 284/288, centre 138/144; every miss is an unreachable last-circle find.
+- Tests: corner roles 284/288, center 138/144; every miss is an unreachable last-circle find.
 - Done 2026-11-19 (not pushed yet): 13 more guild names in `GUILD`.
 - Ludra's breath (`CFG.bingo.breath`): random vertex; orange band from 8.5 s (11.5 s left on the cast), kills from
   9.1 s to 11.5 s (8.5 s left, user-confirmed). Half-width 4.2 m is a guess. Players/bots whose square is in it hold
@@ -79,14 +79,14 @@ directory listing at `/` because the file is no longer `index.html`; rename or a
 - Breath look (from the user's screenshots): white-pink beam from high past the vertex onto the middle, orange-pink
   band on the squares, purple flame bursts.
 - Bots: a runner who can be inside the safe square before a breath starts goes straight in ("BREATH: RUN IN NOW" for
-  the player); centre bots jump into their orb as soon as a jump reaches it once the safe square is found.
-  Teammates caught by the breath or outside at the meteor fall (grey, lying down) and get no more circles.
+  the player); center bots jump into their orb as soon as a jump reaches it once the safe square is found.
+  Teammates caught by the breath or outside at the meteor fall (gray, lying down) and get no more circles.
 - Missing your square is no longer a death (user, 2026-11-19): it's logged in `S.missed`; it only kills if that
   square was the safe one (never found -> the Trial-end death says it was yours). The end screen notes any misses.
 - Meteor (`CFG.bingo.meteor`, visual only): huge cracked magenta ball over the middle for the last 2.5 s of the
   cast, hits at 20.0 s with a shockwave; the kill message now names it.
 - `S.auto = true` (tests only) makes your character follow the bot rules. Tests with it (both breaths), every safe
-  square x every 1st-breath vertex: corner roles 1006/1152, centre 123/144; every miss is a last-circle find (the 2nd
+  square x every 1st-breath vertex: corner roles 1006/1152, center 123/144; every miss is a last-circle find (the 2nd
   breath at 17.5 s blocks most of them; the user said a last-circle find can't be reached from far away); with a find on circles 1-3
   no teammate falls and no bot is caught in a circle.
 - Next: confirm orb marker/height/landing times and the breath width; phase 2 board.

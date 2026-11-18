@@ -30,7 +30,7 @@ video, not confirmed · **Estimate** = tunable guess.
     random (Confirmed). A red marker shows on the ground first; then the orb appears **high in the air** above it
     and **slowly floats down**. A player must **grab it before it reaches the ground**, by **jumping into it**
     while it floats. Right after it appears it's too high to reach: players wait for it to come down a bit
-    (Confirmed). The two centre players handle the orbs.
+    (Confirmed). The two center players handle the orbs.
 12. **Ludra's breath** crosses the board along a **diagonal**, from one of its **4 vertices at random** (Confirmed).
     Ludra **flies to a spot past that vertex and turns to the middle**; her **orange line swings across the board
     with her aim** until it settles on the diagonal, then **fills up** like the circles; then she breathes along it
@@ -109,7 +109,7 @@ Squares are `[row, column]`, row 0 = north edge, column 0 = west edge.
 row 0     O2 →  →  →  I3 O3        O = outside, I = inside, number = corner
 row 1     I2 →  →  →  ↓  ↓         Each pair covers 2 squares per circle and moves
 row 2     ↑  ↑  C↗ C  ↓  ↓         one square clockwise after each snap.
-row 3     ↑  ↑  C  C↙ ↓  ↓         C = the two centre players: 2 squares each,
+row 3     ↑  ↑  C  C↙ ↓  ↓         C = the two center players: 2 squares each,
 row 4     ↑  ↑  ←  ←  ←  I4        then out to the orbs.
 row 5     O1 I1 ←  ←  ←  O4
 ```
@@ -127,11 +127,11 @@ ranged inside, but it's the position that matters.)
 | Corner 3 inside | [0,4] [1,4] [2,4] [3,4] |
 | Corner 4 outside | [5,5] [5,4] [5,3] [5,2] |
 | Corner 4 inside | [4,5] [4,4] [4,3] [4,2] |
-| Centre A | [2,2] [2,3], then beside the north (or east) orb, drop the 3rd circle there, go under the orb, jump into it, then the safe square |
-| Centre B | [3,3] [3,2], then beside the south (or west) orb, drop the 3rd circle there, go under the orb, jump into it, then the safe square |
+| Center A | [2,2] [2,3], then beside the north (or east) orb, drop the 3rd circle there, go under the orb, jump into it, then the safe square |
+| Center B | [3,3] [3,2], then beside the south (or west) orb, drop the 3rd circle there, go under the orb, jump into it, then the safe square |
 
-The centre players must not wait under the orb while their 3rd circle forms, or it drops on the orb spot (Confirmed).
-They wait a few metres to the side, let it snap there, step out, then go under the orb.
+The center players must not wait under the orb while their 3rd circle forms, or it drops on the orb spot (Confirmed).
+They wait a few meters to the side, let it snap there, step out, then go under the orb.
 
 8 × 4 + 2 × 2 = **all 36 squares**, so the safe square is always found if everyone drops on their square. As soon as
 it's found, everyone stops sweeping and runs into it.
@@ -153,35 +153,35 @@ In the `CFG.bingo` block of `ludra-raid-training.html`:
 | Square size | 4 m | Estimate |
 | Circle radius | 1.8 m (a little smaller than a square) | Estimate |
 | "Ludra's Trial" | 16 s cast from 4.0 s, ends 20.0 s after the board | Confirmed length, start approximate |
-| Orbs | 15 m from the centre (just off the board), random axis; marker 8.5 s, appears 9 m up at 9.0 s, lands 14.9 s | Estimates around the confirmed behaviour |
+| Orbs | 15 m from the center (just off the board), random axis; marker 8.5 s, appears 9 m up at 9.0 s, lands 14.9 s | Estimates around the confirmed behavior |
 | Grabbing | touch the orb: a standing player reaches 2.2 m, a jump (Space) adds 1.5 m; within 1.4 m sideways | Estimate |
 | Meteor | appears 2.5 s before the cast ends (17.5 s), flies in from the north, hangs ~11 m over the middle, drops onto the board at 20.0 s; radius 7 m. Visual only: the kill is the Trial check | Timing Confirmed, look and size Estimate |
 | Breath | twice, from two different random vertices: Ludra flies 1.1 s to a spot 8 m past the vertex; line swings in over 55° (side random), times as above; half-width 4.2 m (squares next to the diagonal are safe only in their far corner); only on the board; the safe square protects | Times as above, width Estimate |
-| Teammates | 9 bots following the plan above; the player picks a corner and outside/inside, or a centre spot | Design |
-| Bots once found | run into the safe square (centre players once they have their orb) | Confirmed behaviour |
+| Teammates | 9 bots following the plan above; the player picks a corner and outside/inside, or a center spot | Design |
+| Bots once found | run into the safe square (center players once they have their orb) | Confirmed behavior |
 | Bots and the breath | hold the far corner if their square is in the band; never step into it; if caught, leave the shortest way; while running to a found safe square just before it shows, don't cut through either diagonal | Design |
 | Bots and red circles | never step into a snapped circle; if standing in one, leave the shortest way that doesn't lead into another | Design |
-| Fail conditions | caught in any circle outside the safe square; touched by the breath outside the safe square; your orb lands before you grab it (centre); outside the safe square (or not found) when the cast ends | Design |
+| Fail conditions | caught in any circle outside the safe square; touched by the breath outside the safe square; your orb lands before you grab it (center); outside the safe square (or not found) when the cast ends | Design |
 | Missing your square | not a death by itself (user-confirmed): it only matters if that square was the safe one, because then nobody finds it and the cast kills everyone; the death message and end screen say so | Confirmed |
 
 With those numbers a jump first reaches the orb at about 12.2 s; standing under it, you'd touch it at about 13.3 s.
 
 Tested against every safe square × every 1st-breath vertex (2nd vertex one of the other 3), with the test player
-following the bot rules: corner players clear 1006 of 1152 and the centre player 123 of 144. Every miss is a **last-circle find**:
+following the bot rules: corner players clear 1006 of 1152 and the center player 123 of 144. Every miss is a **last-circle find**:
 it resolves at 16.68 s and the 2nd breath fires at 18.1 s, so unless the safe square is close or on your side of the
 breath, you can't get in before the meteor (the death message says so). When the safe square is found on circles 1–3,
 nobody dies: no bot is touched by the breath or caught in a circle. A player whose square is next to the breath's
 diagonal dies if they stay in the middle of it and survives in the far corner.
 
-Teammates in the trainer fall (grey, lying down) when the breath touches them or they are outside the safe square
+Teammates in the trainer fall (gray, lying down) when the breath touches them or they are outside the safe square
 when the meteor lands; a fallen teammate drops no more circles.
 
 ## Open questions
 
-1. **Orbs:** what happens if one is missed; whether anyone (not just the centre players) can grab them; the exact
+1. **Orbs:** what happens if one is missed; whether anyone (not just the center players) can grab them; the exact
    marker time, start height and landing time.
 2. **Damage area:** the circle only, or the whole square?
-3. **Off the board:** what happens if a circle resolves off the board (the centre players drop theirs at the orbs)?
+3. **Off the board:** what happens if a circle resolves off the board (the center players drop theirs at the orbs)?
 4. **Normal vs hard** differences (the source video is normal mode), and how the second board differs.
 5. **Breath:** the exact width of the band (the trainer's 4.2 m half-width is a guess from screenshots); whether it
    reaches past the board. When Ludra leaves the middle for her 1st spot, how fast she flies, and how far the
