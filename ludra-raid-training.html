@@ -317,7 +317,8 @@ const cam = { yaw: 0, pitch: CFG.camera.pitch, dist: CFG.camera.distance };
 const SIDE = { 0: 'north', 90: 'east', 180: 'south', 270: 'west' };
 let S = null, endedAt = 0, menuOpen = true;
 const GUILD = ['Sulong', 'Sete', 'zPedra', 'Khorham', 'SharkAll', 'Daniel', 'Skazy', 'Chryver', 'Penha', 'ASMRespirito', 'guimaZ',
-  'Comac', 'Brownie', 'Delta', 'Young', 'Seraaph', 'Seithr', 'OguriCap', 'ArrancaPau', 'Hades', 'Tayx', 'Ludin', 'SongWeaver', 'BrunnO'];
+  'Comac', 'Brownie', 'Delta', 'Young', 'Seraaph', 'Seithr', 'OguriCap', 'ArrancaPau', 'Hades', 'Tayx', 'Ludin', 'SongWeaver', 'BrunnO',
+  'Kalard', 'Divinothy', 'Amandinha', 'Lsntn', 'Sexy', 'Takeshão', 'Wintersoldier96', 'Officer do Sartore', 'Hendyel', 'mtkです'];   // mtkです is in the random pool too
 
 function baseState(mech, start, end) {
   return { mech, phase: 'run', t: 0, end, lines: [], sweeps: [], circles: [], drops: [], filled: [], fails: [], hard: opts.hard,
@@ -359,8 +360,8 @@ function newRun(mech) {
     // teammates get guild names: mtkです always, the rest picked at random
     const pool = GUILD.slice();
     for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-    const npcs = actors.filter((a) => !a.me), mtk = Math.floor(Math.random() * npcs.length);
-    npcs.forEach((a, i) => { a.name = i === mtk ? 'mtkです' : pool.pop(); });
+    const npcs = actors.filter((a) => !a.me);
+  npcs.forEach((a) => { a.name = pool.pop(); });   // a fresh random set of names every run
     const me = actors.find((a) => a.me);
     S = Object.assign(baseState('bingo', [me.x, me.y], B.trialStart + B.trial + 0.8), {
       waves, actors, orbs, breaths, breath: breaths[0], trialEnd: B.trialStart + B.trial, trialDone: false, safe: Math.floor(Math.random() * B.grid * B.grid), found: null, missed: [],
@@ -493,8 +494,8 @@ function colorsState() {
   // teammates get guild names, like the Bingo board
   const pool = GUILD.slice();
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-  const npcs = actors.filter((a) => !a.me), mtk = Math.floor(Math.random() * npcs.length);
-  npcs.forEach((a, i) => { a.name = i === mtk ? 'mtkです' : pool.pop(); });
+  const npcs = actors.filter((a) => !a.me);
+  npcs.forEach((a) => { a.name = pool.pop(); });   // a fresh random set of names every run
   const styles = Object.keys(BOT_STYLES);
   for (const a of npcs) { a.style = styles[Math.floor(Math.random() * styles.length)]; a.st = BOT_STYLES[a.style]; }
   const me = actors[0];
