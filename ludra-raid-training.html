@@ -13,6 +13,7 @@
   html,body { height:100%; margin:0; overflow:hidden; background:#06070c; color:var(--text); font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif; }
   canvas { position:fixed; inset:0; width:100%; height:100%; display:block; }
   #flash { position:fixed; inset:0; background:#cfe6ff; opacity:0; pointer-events:none; }
+  #hurt { position:fixed; inset:0; opacity:0; pointer-events:none; background:radial-gradient(ellipse at center, rgba(255,20,40,0) 38%, rgba(255,20,40,.85) 100%); }
   #hud { position:fixed; inset:0; pointer-events:none; text-shadow:0 1px 3px #000,0 0 8px #000; }
   #info { position:absolute; left:18px; top:14px; font-weight:600; letter-spacing:.4px; }
   #call { position:absolute; left:0; right:0; top:14%; text-align:center; font:800 34px system-ui,sans-serif; letter-spacing:1px; }
@@ -66,6 +67,7 @@
 <body>
 <canvas id="c"></canvas>
 <div id="flash"></div>
+<div id="hurt"></div>
 <div id="hud">
   <div id="info"></div><div id="call"></div><div id="sub"></div><div id="hint"></div>
   <div id="cast"><span>Ludra's Trial</span> <span id="castTime"></span><div class="bar"><i id="castFill"></i></div></div>
@@ -102,6 +104,17 @@
           <div><span class="dot" style="background:#4a8dff"></span>Center: jump into your orb (Space) before it lands</div></div>
         <div class="note">Phase 1 board. Your 9 teammates are bots.</div>
       </section>
+      <section class="card" id="cardColors">
+        <div><h2>Colors</h2><div class="sub">Ludra's blue and red orbs · split by aura, keep away from the other color</div></div>
+        <div><div class="label">Strategy</div><div class="seg" id="cStrategy"><button data-v="fixed">Fixed · blue left, red right</button><button data-v="adaptive">Adaptive · least walking</button></div></div>
+        <div class="row"><button id="goColors" class="go">Start</button></div>
+        <div><div class="label">How it works</div>
+          <div><span class="dot" style="background:#4a8dff"></span>Ludra holds a blue orb (left hand) and a red one (right hand)</div>
+          <div><span class="dot" style="background:#4a8dff"></span>Everyone gets a random aura: blue goes west, red goes east</div>
+          <div><span class="dot" style="background:var(--bad)"></span>Too close to an opposite aura hurts both of you</div>
+          <div><span class="dot" style="background:var(--ok)"></span>Same colors can stand together</div></div>
+        <div class="note">Timings and distances are estimates (the orbs start at 4:24 in the Spiritmaster video). Your 9 teammates are bots.</div>
+      </section>
     </div>
     <section class="card shared">
       <div class="col">
@@ -128,7 +141,7 @@ const CFG = {
   start: [0, -15],       // near the north wall, where melee players stand under Ludra
   player: { speed: 6, radius: 0.5 },
   dodge: { iframes: 0.4, dash: 4, dashTime: 0.25, stamina: 100, cost: 20, regen: 10 },   // regen = stamina per second
-  dodgeAvoids: { circle: true, laser: false, strike: false, blast: false, breath: false },
+  dodgeAvoids: { circle: true, laser: false, strike: false, blast: false, breath: false, colors: false },
   jump: { height: 1.5, time: 0.35 },   // Space: peak height (m) and time to reach it (s)
   intro: 3,              // seconds before line 1 strikes
   lineEvery: 4,          // seconds between strikes
@@ -203,6 +216,31 @@ const CFG = {
     // the center players cover 2 squares each, then go to the orbs (A to the north or east orb, B to south or west)
     center: [{ name: 'Center A', path: [[2, 2], [2, 3]], orb: 0 }, { name: 'Center B', path: [[3, 3], [3, 2]], orb: 1 }],
   },
+  // Colors (estimates; the user described it, timings not measured yet). Ludra holds a blue orb in her left hand
+  // and a red one in her right. At `mark` every player and teammate gets a random aura color (blue or red). Blue
+  // auras go to the west side of the room (screen left as you face Ludra), red to the east. Anyone within `radius`
+  // of a player with the opposite color takes damage (it's a death for you). Same colors can stand together.
+  colors: {
+    orbsAt: 3.0,            // the orbs show in Ludra's hands
+    mark: 6.0,              // auras are given; the team has until `end` to split up
+    end: 16.0,              // the mechanic is over: anyone still alive is clear
+    radius: 4,              // estimate: the distance at which opposite auras hurt each other
+    hands: { x: 7, y: 12, z: -26 },   // world position of Ludra's hands (blue at -x, red at +x)
+    // spawns (random, at least minGap apart): you + 4 bots stay near the north wall (melee / tanks), 5 bots spread
+    // across the north half between west and east, not much past the middle toward the south
+    maxTicks: 5,            // hits from the other color before you (or a teammate) go down
+    tickEvery: 0.5,         // while the other color stays close, one more hit every this many seconds
+    melee: 5,               // 5 bots are melee: they always stay in the north strip near Ludra, whatever their color
+    speed: 5,               // bots walk at this speed (m/s) while they move around their area
+    // where each group may walk, in the frame of the players facing Ludra (u = toward their color's side, v = toward
+    // Ludra; the room is 40 m, so 20 is a wall). Melee: 5..15 across (skipping the outer tile at each end), 10..18 deep
+    // (near Ludra). Ranged: 5..18 across, -2..14 deep.
+    area: { melee: { u: [6, 13], v: [11, 18] }, ranged: { u: [6, 16], v: [0, 12] } },   // tighter than before: more pressure
+    // teleports (placeholder timings, to be tuned from the video): Ludra vanishes at `first` s, reappears at another corner
+    // `gap` s later, and the team has `adjust` s to get into place before the next teleport
+    tp: { first: 12.0, gap: 1.5, adjust: 8.0 },
+    spawn: { minGap: 4.5, player: [0, -16], north: { x: [-16, 16], y: [-18, -15], count: 5 }, spread: { x: [-17, 17], y: [-14, 2], count: 4 } },
+  },
   camera: { distance: 11, pitch: 0.42, minDist: 4, maxDist: 28 },
 };
 
@@ -214,7 +252,7 @@ const cv = $('c');
 const HALF = CFG.arenaSize / 2, STEP = 1 / 120;
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const keys = new Set();
-const opts = { hard: false, speed: 1, keep: false, sens: 1, callouts: true, mech: 'zikel', bCorner: 1, bRole: 'outside' };
+const opts = { hard: false, speed: 1, keep: false, sens: 1, callouts: true, mech: 'zikel', bCorner: 1, bRole: 'outside', colorsStrategy: 'fixed' };
 try { Object.assign(opts, JSON.parse(localStorage.zikelTrainer || '{}')); } catch {}
 if (opts.bRole === 'melee') opts.bRole = 'outside'; else if (opts.bRole === 'ranged') opts.bRole = 'inside'; else if (opts.bRole === 'centre') opts.bRole = 'center';   // older saved settings
 const saveOpts = () => { try { localStorage.zikelTrainer = JSON.stringify(opts); } catch {} };
@@ -233,6 +271,7 @@ function newRun(mech) {
   mech = mech || (S && S.mech) || opts.mech || 'zikel';
   if (opts.mech !== mech) { opts.mech = mech; saveOpts(); }
   cam.yaw = 0; cam.pitch = CFG.camera.pitch;
+  if (mech === 'colors') { S = colorsState(); return; }
   if (mech === 'bingo') {
     const B = CFG.bingo, waves = [], actors = [];
     for (let i = 0; i < B.count; i++) { const t0 = B.intro + i * (B.life + B.gap); waves.push({ n: i + 1, t0, tSnap: t0 + B.follow, t1: t0 + B.life, done: false }); }
@@ -286,6 +325,171 @@ function newRun(mech) {
   const last = lines[lines.length - 1].t0;
   const end = Math.max(last + CFG.strikeToBlast, last + (opts.hard ? CFG.hard.circleDelay[1] + CFG.hard.circleFill : 0), ...sweeps.map((s) => s.tEnd)) + 0.6;
   S = Object.assign(baseState('zikel', CFG.start, end), { lines, sweeps });
+}
+
+// ----------------------------------------------------------------------------
+// Colors: Ludra's two orbs (blue left hand, red right) give every player and teammate a random aura. Opposite auras
+// within CFG.colors.radius hurt both (hits). Each color keeps to one side of the room, and Ludra can teleport to another
+// corner (she always starts north). Sides are seen from the players facing Ludra, so "left" and "right" depend on where
+// she is. Fixed strategy: blue always takes the left. Adaptive: whichever assignment needs less walking, and the other
+// color goes around behind. Rules here; visuals in syncColors().
+// Frame: g = unit vector from the middle of the room toward Ludra; left = the players' left when they face g.
+// A point is (u, v): u = how far toward its color's side, v = how far toward Ludra.
+// ----------------------------------------------------------------------------
+const auraName = (c) => (c === 'blue' ? 'BLUE' : 'RED');
+const COLOR_CORNERS = [{ x: 0, y: -1 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }];   // N (start), W, S, E
+const compassName = (v) => (Math.abs(v.y) > Math.abs(v.x) ? (v.y < 0 ? 'NORTH' : 'SOUTH') : (v.x < 0 ? 'WEST' : 'EAST'));
+const frameOf = (ci) => { const g = COLOR_CORNERS[ci], left = { x: g.y, y: -g.x }; return { ci, g, left }; };
+const sideOf = (f, color, leftColor) => (color === leftColor ? f.left : { x: -f.left.x, y: -f.left.y });
+const uvOf = (f, side, x, y) => ({ u: x * side.x + y * side.y, v: x * f.g.x + y * f.g.y });
+const pointOf = (f, side, u, v) => ({ x: side.x * u + f.g.x * v, y: side.y * u + f.g.y * v });
+// where an actor should be: their color's side, and the melee strip (near Ludra) or the ranged rows
+const colorsRect = (role) => (role === 'melee' ? CFG.colors.area.melee : CFG.colors.area.ranged);
+const rectDist = (uv, r) => Math.hypot(Math.max(r.u[0] - uv.u, 0, uv.u - r.u[1]), Math.max(r.v[0] - uv.v, 0, uv.v - r.v[1]));
+const colorsSide = (color) => sideOf(S.frame, color, S.leftColor);
+function colorsInArea(a, x, y) {
+  const uv = uvOf(S.frame, colorsSide(a.color), x, y), r = colorsRect(a.role);
+  return uv.u >= r.u[0] && uv.u <= r.u[1] && uv.v >= r.v[0] && uv.v <= r.v[1];
+}
+// a spot for an actor: random inside their area; if they're on the wrong side, the nearest point of their area
+function colorsGoal(a) {
+  const f = S.frame, side = colorsSide(a.color), r = colorsRect(a.role);
+  let u, v;
+  if (colorsInArea(a, a.x, a.y)) {
+    u = r.u[0] + Math.random() * (r.u[1] - r.u[0]);
+    v = r.v[0] + Math.random() * (r.v[1] - r.v[0]);
+  } else {
+    const uv = uvOf(f, side, a.x, a.y);
+    u = clamp(uv.u, r.u[0], r.u[1]);
+    v = clamp(uv.v, r.v[0], r.v[1]);
+  }
+  const p = pointOf(f, side, u, v);
+  return [p.x, p.y];
+}
+// the assignment (which color takes the left) that needs the least walking from where everyone is now
+function colorsBestLeft(ci) {
+  if (opts.colorsStrategy !== 'adaptive') return 'blue';
+  const f = frameOf(ci);
+  const cost = (L) => S.actors.reduce((s, a) => (a.dead ? s : s + rectDist(uvOf(f, sideOf(f, a.color, L), a.x, a.y), colorsRect(a.role))), 0);
+  return cost('blue') <= cost('red') ? 'blue' : 'red';
+}
+function colorsClash(a, x, y) {
+  const R = CFG.colors.radius + 0.3;   // a little margin so bots don't graze each other
+  return S.actors.some((b) => b !== a && !b.dead && b.color !== a.color && Math.hypot(x - b.x, y - b.y) < R);
+}
+// bot steering: the straight line first, then the smallest sidestep (every 0.1 rad, either way) that doesn't clash
+const SIDESTEP = [0];
+for (let s = 1; s <= 31; s++) SIDESTEP.push(s * 0.1, -s * 0.1);
+// spawn points: index 0 is you, then the melee group, then the ranged group. Random, never closer than minGap.
+function colorsSpawns() {
+  const SP = CFG.colors.spawn;
+  // redo the whole set if a group can't fit (so nobody ever starts on top of an opposite aura)
+  for (let attempt = 0; attempt < 500; attempt++) {
+    const pts = [SP.player.slice()];
+    const ok = (x, y) => pts.every(([px, py]) => Math.hypot(x - px, y - py) >= SP.minGap);
+    const place = (g) => {
+      for (let n = 0; n < g.count; n++) {
+        let p = null;
+        for (let tries = 0; tries < 300 && !p; tries++) {
+          const x = g.x[0] + Math.random() * (g.x[1] - g.x[0]), y = g.y[0] + Math.random() * (g.y[1] - g.y[0]);
+          if (ok(x, y)) p = [x, y];
+        }
+        if (!p) return false;
+        pts.push(p);
+      }
+      return true;
+    };
+    if (place(SP.north) && place(SP.spread)) return pts;
+  }
+  return [SP.player.slice()];
+}
+function colorsState() {
+  const M = CFG.colors, actors = [], spawns = colorsSpawns();
+  // you, then the melee bots (north edge), then the ranged bots (spread across the north half)
+  spawns.forEach(([x, y], i) => actors.push({ me: i === 0, role: i === 0 ? 'you' : i <= M.melee ? 'melee' : 'ranged', name: '', x, y, z: 0, vz: 0,
+    color: Math.random() < 0.5 ? 'blue' : 'red', dead: null, mark: null, ticks: 0, nextTick: 0, goal: null, goalUntil: 0, wait: 0 }));
+  // teammates get guild names, like the Bingo board
+  const pool = GUILD.slice();
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const npcs = actors.filter((a) => !a.me), mtk = Math.floor(Math.random() * npcs.length);
+  npcs.forEach((a, i) => { a.name = i === mtk ? 'mtkです' : pool.pop(); });
+  const me = actors[0];
+  me.name = 'you';
+  // stage 1 = Ludra north. Each teleport: she vanishes, reappears at another corner after `gap`, and the team has `adjust`
+  // seconds to get into place before the next one. Placeholder timings.
+  const n = 3, T = M.tp, tps = [];   // always 3 stages: Ludra north, then two teleports
+  for (let k = 0; k < n - 1; k++) { const vanish = T.first + k * (T.gap + T.adjust); tps.push({ vanish, reappear: vanish + T.gap, done: 0 }); }
+  const lastReappear = tps.length ? tps[tps.length - 1].reappear : 0;
+  const end = n === 1 ? M.end : lastReappear + T.adjust + 2;
+  return Object.assign(baseState('colors', [me.x, me.y], end + 0.8), { actors, marked: false, who: 'Aura ' + auraName(me.color),
+    cornerIdx: 0, frame: frameOf(0), leftColor: 'blue', hidden: false, tps, stage: 1, stages: n });
+}
+function colorsStep(t, P, inv, A, dt) {
+  const M = CFG.colors, me = S.actors.find((a) => a.me);
+  me.x = P.x; me.y = P.y; me.z = P.z;
+  if (!S.marked && t >= M.mark) {   // the auras are given now
+    S.marked = true;
+    for (const a of S.actors) a.mark = t;
+    S.leftColor = colorsBestLeft(0);
+  }
+  // teleports: Ludra vanishes, then reappears at another corner (not the one she's at), and the sides are set for it
+  for (let k = 0; k < S.tps.length; k++) {
+    const ev = S.tps[k];
+    if (ev.done === 0 && t >= ev.vanish) { ev.done = 1; S.hidden = true; }
+    if (ev.done === 1 && t >= ev.reappear) {
+      ev.done = 2; S.hidden = false;
+      const others = [0, 1, 2, 3].filter((i) => i !== S.cornerIdx);
+      S.cornerIdx = others[Math.floor(Math.random() * others.length)];
+      S.frame = frameOf(S.cornerIdx);
+      S.leftColor = colorsBestLeft(S.cornerIdx);
+      S.stage = k + 2;
+      for (const a of S.actors) { a.goal = null; a.wait = 0; a.ref = null; }   // everyone picks a new spot
+    }
+  }
+  if (S.marked) {
+    // teammates wander inside their area, sidestepping anyone with the opposite aura. They pause now and then and pick a
+    // new spot now and then, like a person would. Wrong-side ones head straight for their side.
+    for (const a of S.actors) {
+      if (a.me || a.dead) continue;
+      if (a.wait > 0) { a.wait -= dt; a.ref = null; continue; }
+      if (a.goal && Math.hypot(a.goal[0] - a.x, a.goal[1] - a.y) < 0.3) { a.goal = null; a.wait = 0.5 + Math.random() * 2; a.ref = null; continue; }
+      // a new spot every few seconds, but not while they're still on the wrong side: they keep heading for their side
+      if (!a.goal || (t >= a.goalUntil && colorsInArea(a, a.x, a.y))) { a.goal = colorsGoal(a); a.goalUntil = t + 3 + Math.random() * 3; }
+      const dx = a.goal[0] - a.x, dy = a.goal[1] - a.y, d = Math.hypot(dx, dy);
+      let base = Math.atan2(dy, dx);
+      if (t < (a.detour || 0)) base += a.side * Math.PI / 2;   // walking around a crowd that blocks the straight way
+      const step = Math.min(M.speed * dt, d);
+      for (const off of SIDESTEP) {
+        const ang = base + off, nx = a.x + Math.cos(ang) * step, ny = a.y + Math.sin(ang) * step;
+        if (!colorsClash(a, nx, ny)) { a.x = nx; a.y = ny; break; }
+      }
+      // stuck: after 0.8 s without getting at least 0.6 m away from where they were (e.g. jammed against the other color
+      // on the wrong side), walk around the crowd for a moment and pick a new spot
+      if (!a.ref || t - a.ref.t >= 0.8) {
+        if (a.ref && Math.hypot(a.x - a.ref.x, a.y - a.ref.y) < 0.6) { a.side = Math.random() < 0.5 ? 1 : -1; a.detour = t + 1.2; a.goal = colorsGoal(a); a.goalUntil = t + 3 + Math.random() * 3; }
+        a.ref = { x: a.x, y: a.y, t };
+      }
+    }
+    // opposite auras too close: each one ticks (once on contact, then every tickEvery s while close). maxTicks ticks
+    // kills (teammates fall; for you it's a loss). Both players in the pair take the tick.
+    const live = S.actors.filter((a) => !a.dead);
+    for (let i = 0; i < live.length; i++) for (let j = i + 1; j < live.length; j++) {
+      const a = live[i], b = live[j];
+      if (a.color === b.color || Math.hypot(a.x - b.x, a.y - b.y) >= M.radius) continue;
+      if ((a.me || b.me) && inv && A.colors) continue;
+      for (const x of [a, b]) {
+        if (t < x.nextTick) continue;
+        x.nextTick = t + M.tickEvery;
+        x.ticks++;
+        if (x.me) S.hitAt = t;   // your red flash
+        if (x.ticks >= M.maxTicks) {
+          x.dead = t;
+          if (x.me) { fail('Hit ' + x.ticks + ' times by the other color\'s aura: too many hits'); if (S.phase !== 'run') return; }
+        }
+      }
+    }
+  }
+  if (t >= S.end - 0.8) finish(true);
 }
 
 // Bingo: square center from [row, col], and which square (row-major index) a point is on, or -1 off the board
@@ -519,6 +723,7 @@ function update(dt) {
   fall(P, dt);
   const inv = t < S.iUntil, A = CFG.dodgeAvoids;
   if (S.mech === 'bingo') { bingoStep(t, P, inv, A, dt); return; }
+  if (S.mech === 'colors') { colorsStep(t, P, inv, A, dt); return; }
 
   for (const ln of S.lines) {
     const dist = Math.abs((P.x - ln.cx) * ln.dy - (P.y - ln.cy) * ln.dx);
@@ -803,6 +1008,65 @@ const sweepViz = CFG.sweeps.flat().map(() => {
   return v;
 });
 
+// Colors: Ludra's two orbs (blue in her left hand, red in her right), a spinning aura and a ground field per
+// player (the field shows the repulsion radius and turns red when someone is too close to an opposite aura)
+const MAG_COL = { blue: 0x4a8dff, red: 0xff4a5a };
+const magOrbs = [{ c: 0x4a8dff, s: -1 }, { c: 0xff4a5a, s: 1 }].map(({ c, s }) => {
+  const g = new THREE.Group();
+  const core = new THREE.Mesh(new THREE.SphereGeometry(1.1, 24, 16), flat(0xf4fbff, 0.95, { blending: ADD }));
+  const halo = new THREE.Mesh(new THREE.SphereGeometry(1.9, 24, 16), flat(c, 0.45, { blending: ADD }));
+  core.renderOrder = halo.renderOrder = 8; g.add(core, halo); g.userData = { s, halo }; g.visible = false; scene.add(g); return g;
+});
+const magAuras = Array.from({ length: MAXA }, () => {
+  const g = new THREE.Group(), dots = [0, 1, 2].map(() => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 8), flat(0xffffff, 1, { blending: ADD })); g.add(m); return m; });
+  const ring = ground(new THREE.RingGeometry(0.95, 1.1, 40).rotateX(-Math.PI / 2), flat(0xffffff, 0.9, { blending: ADD }), 0.08, 7);
+  g.add(ring); g.visible = false; scene.add(g); return { g, dots, ring };
+});
+const magFields = Array.from({ length: MAXA }, () => { const m = ground(new THREE.CircleGeometry(CFG.colors.radius, 48).rotateX(-Math.PI / 2), flat(0xffffff, 0.12), 0.05, 2); m.visible = false; scene.add(m); return m; });
+function syncColors(t, P) {
+  const M = CFG.colors, isM = !!S && S.mech === 'colors';
+  if (!isM) {   // other mechanics: keep the colors objects hidden and leave the bots alone
+    for (const g of magOrbs) g.visible = false;
+    for (let i = 0; i < MAXA; i++) { magAuras[i].g.visible = false; magFields[i].visible = false; }
+    return;
+  }
+  // Ludra: north at the start, then at her corner after each teleport (hidden while she's away)
+  const C = S.frame.g, L = 32;   // 32 = how far she is from the middle of the room
+  ludra.visible = !S.hidden;
+  ludra.position.set(C.x * L, 0, C.y * L);
+  ludra.rotation.set(0, Math.atan2(-C.x, -C.y), 0);   // her face toward the room
+  const orbOn = t >= M.orbsAt && t < M.mark + 0.6;
+  for (const g of magOrbs) {
+    g.visible = orbOn;
+    if (!orbOn) continue;
+    g.position.set(g.userData.s * M.hands.x, M.hands.y, M.hands.z);
+    const k = t < M.mark ? 1 + 0.08 * Math.sin(t * 9 + g.userData.s) : Math.max(0, 1 - (t - M.mark) / 0.6);   // pulse, then fade out as they're given
+    g.scale.setScalar(k); g.userData.halo.scale.setScalar(1.1 + 0.06 * Math.sin(t * 7));
+  }
+  let bi = 0;
+  for (let i = 0; i < MAXA; i++) {
+    const au = magAuras[i], fld = magFields[i], a = S.actors[i];
+    if (!a) { au.g.visible = false; fld.visible = false; continue; }
+    const given = isM && S.marked, x = a.me ? P.x : a.x, y = a.me ? P.y : a.y;
+    if (!a.me) {   // teammates: body + name tag (fallen ones lie down)
+      const m = bots[bi], tag = tags[bi++], down = !!a.dead;
+      m.visible = tag.visible = true; m.material = down ? botDeadMat : botMat.center;
+      m.position.set(a.x, down ? 0.45 : 0.9, a.y); m.rotation.set(0, 0, down ? Math.PI / 2 : 0);
+      if (tag.userData.name !== a.name) { tag.userData.name = a.name; tag.material.map = nameTag(a.name); tag.material.needsUpdate = true; }
+      tag.position.set(a.x, down ? 1.3 : 2.35, a.y); tag.material.opacity = down ? 0.45 : 1;
+    }
+    const show = given && !a.dead;
+    au.g.visible = show; fld.visible = show;
+    if (!show) continue;
+    const col = new THREE.Color(MAG_COL[a.color]);
+    au.g.position.set(x, 0, y); au.ring.material.color.copy(col);
+    au.dots.forEach((d, k) => { const ang = t * 3.2 + k * 2.094; d.material.color.copy(col); d.position.set(Math.cos(ang) * 0.95, 0.9, Math.sin(ang) * 0.95); });
+    fld.position.set(x, 0, y);
+    const hot = colorsClash(a, x, y);
+    fld.material.color.setHex(hot ? 0xff2a3a : MAG_COL[a.color]); fld.material.opacity = hot ? 0.35 + 0.15 * Math.sin(t * 20) : 0.12;
+  }
+  for (; bi < bots.length; bi++) bots[bi].visible = tags[bi].visible = false;
+}
 const IDLE = { x: CFG.start[0], y: CFG.start[1], fx: 0, fy: -1 };
 let flashShown = -1;
 function sync() {
@@ -825,6 +1089,8 @@ function sync() {
   blast.visible = flash > 0; blastMat.opacity = 0.9 * flash;
   const mHit = S && S.mech === 'bingo' && t >= S.trialEnd ? Math.max(0, 1 - (t - S.trialEnd) / 0.6) : 0;   // meteor impact
   const fo = Math.round(Math.max(flash, mHit) * 28) / 100; if (fo !== flashShown) { flashShown = fo; $('flash').style.opacity = fo; }
+  // colors: red flash on each hit from the other color (fades over 0.4 s)
+  $('hurt').style.opacity = S && S.hitAt != null ? (Math.max(0, 1 - (t - S.hitAt) / 0.4) * 0.9).toFixed(2) : 0;
 
   for (let i = 0; i < circleViz.length; i++) {
     const v = circleViz[i], c = S && S.circles.find((q) => q.n === i + 1), k = c ? (t - c.t0) / (c.t1 - c.t0) : 9;
@@ -952,6 +1218,7 @@ function sync() {
     v.ring.visible = v.fill.visible = k < 1;
   }
   for (; bi < bots.length; bi++) bots[bi].visible = tags[bi].visible = false;
+  syncColors(t, P);
   // third-person orbit camera
   const cp = Math.cos(cam.pitch), ty = 1.5;
   camera.position.set(P.x + Math.sin(cam.yaw) * cam.dist * cp, Math.max(0.35, ty + cam.dist * Math.sin(cam.pitch)), P.y + Math.cos(cam.yaw) * cam.dist * cp);
@@ -969,10 +1236,11 @@ function hud() {
   if (cast._v !== showCast) { cast._v = showCast; cast.style.display = showCast ? 'block' : 'none'; }
   if (showCast) { const left = S.trialEnd - S.t; $('castFill').style.width = (left / CFG.bingo.trial * 100).toFixed(1) + '%'; setText($('castTime'), left.toFixed(1)); }
   if (!S) { setText(info, ''); setText(call, '', ''); setText(sub, ''); setText(hint, ''); return; }
-  const t = S.t, bingo = S.mech === 'bingo';
+  const t = S.t, bingo = S.mech === 'bingo', colors = S.mech === 'colors';
   const n = bingo ? S.waves.filter((w) => t >= w.t0).length : S.lines.filter((l) => t >= l.t0 - CFG.telegraph).length;
   const total = bingo ? S.waves.length : S.lines.length, what = bingo ? 'Circle ' : 'Line ';
-  setText(info, (bingo ? 'BINGO BOARD  ·  ' + S.who : S.hard ? 'HARD' : 'NORMAL') + '  ·  ' + (n ? what + n + ' / ' + total : 'Get ready') + (opts.keep ? '  ·  Mistakes: ' + S.fails.length : ''));
+  const counter = colors ? (t < CFG.colors.mark ? 'Ludra charges the orbs' : 'Stage ' + S.stage + ' / ' + S.stages + '  ·  Hits ' + S.actors.find((a) => a.me).ticks + ' / ' + CFG.colors.maxTicks) : (n ? what + n + ' / ' + total : 'Get ready');
+  setText(info, (bingo ? 'BINGO BOARD  ·  ' + S.who : colors ? 'COLORS  ·  ' + S.who : S.hard ? 'HARD' : 'NORMAL') + '  ·  ' + counter + (opts.keep ? '  ·  Mistakes: ' + S.fails.length : ''));
   const again = 'R or Enter to retry  ·  Esc for settings', found = bingo && S.found ? 'Safe square found by ' + S.found.by + '.\n' : '';
   if (S.phase === 'dead') { setText(call, 'YOU DIED', 'bad'); setText(sub, S.fails.join('\n') + '\n' + again); }
   else if (S.phase === 'clear') {
@@ -980,6 +1248,22 @@ function hud() {
     setText(call, 'CLEARED', 'ok'); setText(sub, found + missNote + again);
   }
   else if (S.phase === 'done') { setText(call, S.fails.length + (S.fails.length > 1 ? ' MISTAKES' : ' MISTAKE'), 'bad'); setText(sub, S.fails.join('\n') + '\n' + again); }
+  else if (colors) {
+    let main = '', cls = '';
+    const me = S.actors.find((a) => a.me), P = S.p, lines = [];
+    if (t < CFG.colors.mark) { main = opts.callouts ? 'LUDRA CHARGES THE ORBS' : ''; cls = 'out'; lines.push('Blue orb in her left hand · red in her right'); }
+    else if (!me.dead && opts.callouts) {
+      const R = CFG.colors.radius, near = S.actors.some((b) => b !== me && !b.dead && b.color !== me.color && Math.hypot(b.x - P.x, b.y - P.y) < R + 1.5);
+      const side = compassName(colorsSide(me.color));
+      if (S.hidden) { main = 'LUDRA IS TELEPORTING'; cls = 'out'; }
+      else if (near) { main = 'TOO CLOSE: MOVE AWAY FROM THE ' + (me.color === 'blue' ? 'RED' : 'BLUE') + ' AURAS'; cls = 'bad'; }
+      else if (!colorsInArea(me, P.x, P.y)) { main = 'YOU ARE ' + auraName(me.color) + ': GO ' + side; cls = me.color === 'blue' ? 'in' : 'bad'; }
+      else { main = 'STAY ON YOUR SIDE (' + side + ')'; cls = 'ok'; }
+      lines.push('Your aura: ' + auraName(me.color) + ' · keep away from the other color');
+    }
+    else if (me.dead) { lines.push('Your aura: ' + auraName(me.color)); }
+    setText(call, main, cls); setText(sub, lines.join('\n'));
+  }
   else if (opts.callouts && bingo) {
     const B = CFG.bingo, w = S.waves.find((q) => t >= q.t0 && !q.done), wi = S.waves.indexOf(w), held = w && t < w.tSnap, last = w && w.n === S.waves.length;
     const me = S.actors.find((a) => a.me), myOrb = me.orb != null ? S.orbs[me.orb] : null, ks = snapsPassed(t);
@@ -1087,6 +1371,8 @@ function syncUI() {
   $('resumeRow').style.display = running ? '' : 'none';
   $('go').textContent = S && S.mech === 'zikel' ? 'Restart' : 'Start';
   $('goBingo').textContent = S && S.mech === 'bingo' ? 'Restart' : 'Start';
+  $('goColors').textContent = S && S.mech === 'colors' ? 'Restart' : 'Start';
+  for (const b of $('cStrategy').children) b.classList.toggle('on', b.dataset.v === opts.colorsStrategy);
   for (const b of $('bCorner').children) b.classList.toggle('on', +b.dataset.v === +opts.bCorner);
   for (const b of $('bRole').children) b.classList.toggle('on', b.dataset.v === opts.bRole);
   const center = opts.bRole === 'center', P2 = CFG.bingo.paths[opts.bCorner];
@@ -1111,6 +1397,8 @@ $('keep').addEventListener('change', (e) => { opts.keep = e.target.checked; save
 $('callouts').addEventListener('change', (e) => { opts.callouts = e.target.checked; saveOpts(); });
 $('go').addEventListener('click', () => start('zikel'));
 $('goBingo').addEventListener('click', () => start('bingo'));
+$('goColors').addEventListener('click', () => start('colors'));
+$('cStrategy').addEventListener('click', (e) => { if (e.target.dataset.v) { opts.colorsStrategy = e.target.dataset.v; saveOpts(); syncUI(); } });
 $('resume').addEventListener('click', closeMenu);
 
 window.zikel = { CFG, opts, cam, STEP, newRun, update, sync, hud, get S() { return S; }, render: () => { sync(); hud(); renderer.render(scene, camera); } };

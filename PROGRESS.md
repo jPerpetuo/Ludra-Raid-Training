@@ -94,6 +94,34 @@ directory listing at `/` because the file is no longer `index.html`; rename or a
   Always check a frame count against two timestamps before converting.
 - Filled squares are visual only until the user confirms what they do.
 
+## Colors (2026-11-19, from the user's description and the Spiritmaster video at 4:24)
+- Third card on the start screen. Reference and open questions: `ludra-colors-mechanic.md`. Rules in `colorsStep()`,
+  values in `CFG.colors`, visuals in `syncColors()`.
+- Bots now wander instead of standing on fixed spots: 5 melee stay in the north strip near Ludra, 4 ranged spread
+  across the rows, all inside their color's side (`CFG.colors.region`). Same colors may overlap. Test (300 runs,
+  you standing still): no bot hits, opposite colors never closer than 4.3 m, 94% of bots on their own side at the end.
+- Wrong-side bots now cross straight to their side (nearest edge as the goal) and walk around a crowd when jammed
+  (stuck = under 0.6 m of progress in 0.8 s). 300-run test: 97% of bots on their own side at the end, 0 bot hits,
+  opposite colors never closer than 4.3 m.
+- Hits, not instant death: each contact with an opposite aura ticks (contact, then every 0.5 s); 5 hits = down
+  (`CFG.colors.maxTicks`, `tickEvery`). Red screen flash on each hit (`#hurt`), "Hits x / 5" in the info line.
+- Ludra's orbs (blue left, red right) show at 3.0 s; at 6.0 s every player and bot gets a random aura (spinning
+  ring + ground field). Blue goes west, red goes east. Opposite auras within 4 m hurt both (you: death).
+- Bots walk to their side and sidestep opposite auras (`SIDESTEP`, `colorsClash()`). Bot-only test, 300 runs, your
+  character standing out of the way: 0 bot deaths; 95% of bots reach their spot; ~3% end on the wrong side (a
+  crowd crossing in the middle leaves a few stuck). Not fixed yet.
+- Nothing measured frame by frame yet: all timings and distances are estimates.
+
 ## Next
 - User playtest for timing/size feel; tune `CFG`.
 - Ideas not started: sound cues, party bots, other Ludra mechanics, hosting (GitHub Pages).
+
+## Colors: teleport phases (2026-11-19)
+- Ludra starts north, then teleports twice (always 3 stages). Each jump goes to W, S, E or north (random, not the same corner)
+  `CFG.colors.tp` holds the placeholder timings.
+- Strategy (menu): fixed (blue left, red right as seen from Ludra) or adaptive (least walking; the other color goes
+  around). Frame and sides in `colorsFrame`-style helpers `frameOf`, `colorsSide`, `colorsBestLeft`.
+- Melee use the boss-side strip (`CFG.colors.area.melee`), ranged the rows (`area.ranged`). Areas tightened (melee u 6..13, v 11..18; ranged u 6..16, v 0..12).
+- Tests (60 runs each, all 6 combinations): no bot hits, no opposite colors within 4.3 m, 98–100% of bots on their
+  side at the end. Fixed never flips sides; adaptive flips about half the time.
+- Not checked in the browser visually after a teleport (the menu covered the screen in the last check).

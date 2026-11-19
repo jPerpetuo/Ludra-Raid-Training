@@ -6,6 +6,8 @@ real third-person camera, at full or reduced speed, as many times as you like:
 - **Zikel:** the orange lines, the laser walls and the hard-mode circles.
 - **Bingo board** (phase 1): sweep the board with 9 bot teammates, find the safe square, dodge Ludra's two breaths
   and get inside before the meteor lands.
+- **Colors**: Ludra's blue and red orbs. Every player gets a random aura and has to split by color, keeping away
+  from the opposite one. Timings are estimates.
 
 Made by **mtkです [Siel] · South America**.
 
@@ -99,6 +101,7 @@ Anyone can use this tool, share it with their static or legion, and improve on i
 | `ludra-raid-training.html` | The trainer: one self-contained page |
 | `ludra-zikel-mechanic.md` | Zikel reference: rules, timings, sources, open questions |
 | `ludra-bingo-mechanic.md` | Bingo board reference: rules, timings, the common solve, open questions |
+| `ludra-colors-mechanic.md` | Colors reference: the orbs, the auras, the sides, open questions |
 | `PROGRESS.md` | Development notes |
 | `index.html` | Sends the website address straight to the trainer |
 | `docs/` | Images for this README |
