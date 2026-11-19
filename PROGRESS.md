@@ -17,8 +17,6 @@ Mechanic references (keep them in sync when numbers change): `ludra-zikel-mechan
   `hud()` writes the text. Each mechanic has its own `*Step` (`bingoStep`, `colorsStep`) and `sync*` helpers.
 - `window.zikel` exposes `CFG`, `opts`, `newRun`, `update`, `sync`, `hud`, `render`, `S`, `cam` and `ludra` for scripted
   tests from the console.
-- Text: `T('English text')` returns the Portuguese text when the language is `pt`; `PT_JS` and `PT_HTML` hold the
-  translations. The page text is swapped by `applyHtmlLang()`.
 
 ## Status
 
@@ -27,7 +25,6 @@ Mechanic references (keep them in sync when numbers change): `ludra-zikel-mechan
 - **Colors:** done, with three stages (Ludra in the north, then two flights to the west, south or east, never the
   opposite corner). Fixed or adaptive sides. Five blue and five red auras, hits every 0.5 s within 5.5 m, five hits to
   go down. Melee stay near Ludra; ranged spread out with spacing. Stage 1 always uses the fixed sides.
-- **Language:** English and Português, with flag buttons in the top-right corner. Default is Portuguese.
 - **Demo GIFs:** `docs/demo/*.gif` are captured from the simulator (headless Chrome driving the page, frames assembled
   with ffmpeg). The capture script is not in the repository.
 

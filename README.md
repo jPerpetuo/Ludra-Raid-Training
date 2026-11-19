@@ -10,7 +10,7 @@ real third-person camera, at full or reduced speed, as many times as you like:
   close to the other color. Ludra flies between corners, so the team has to regroup each time.
 
 **Original trainer:** made by **mtkです [Siel] · South America**.
-**This fork:** by **Kalard [Marchutan]**, adding the Colors mechanic, the Portuguese language and the demo GIFs.
+**This fork:** by **Kalard [Marchutan]**, adding the Colors mechanic and the demo GIFs.
 
 ## ▶ [Play it in your browser](https://jperpetuo.github.io/Ludra-Raid-Training/)
 
@@ -19,11 +19,6 @@ Nothing to download and no account needed. Use a computer with a keyboard and mo
 > **Unofficial fan project.** Made by players, for players. Not affiliated with, endorsed by or connected to NCSOFT.
 > AION is a trademark of NCSOFT. No game files, art or sounds are used: everything you see is drawn with simple
 > original shapes.
-
-## Language
-
-Click the flags in the top-right corner to switch between Portuguese (🇧🇷, the default) and English (🇺🇸). The inactive
-flag is shown in grey. Your choice is saved in the browser.
 
 ## Demos
 
