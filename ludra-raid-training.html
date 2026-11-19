@@ -1118,7 +1118,7 @@ function syncColors(t, P) {
   if (!isM) {   // other mechanics: keep the colors objects hidden and leave the bots alone
     for (const g of magOrbs) g.visible = false;
     for (let i = 0; i < MAXA; i++) { magAuras[i].g.visible = false; magFields[i].visible = false; }
-    ludra.visible = true; setLudraFade(1);
+    ludra.visible = !window.__hideLudra; setLudraFade(1);   // (__hideLudra: demo capture only)
     return;
   }
   // Ludra: north at the start. Each teleport she flies up and fades out, is gone for the gap, then flies down and fades
