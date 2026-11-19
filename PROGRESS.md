@@ -125,3 +125,7 @@ directory listing at `/` because the file is no longer `index.html`; rename or a
 - Tests (60 runs each, all 6 combinations): no bot hits, no opposite colors within 4.3 m, 98–100% of bots on their
   side at the end. Fixed never flips sides; adaptive flips about half the time.
 - Not checked in the browser visually after a teleport (the menu covered the screen in the last check).
+
+- Spacing (`CFG.colors.spacing`): ranged spots keep 3.5 m from other ranged bots, melee 2.5 m. Melee now hug the boss (v 16..19). Test (80 runs): median nearest ranged neighbour 6.8 m at 10 s, 7% under 2 m; 100% on side; no hits.
+
+- Stacking fixed: spots are scored, teammates of the same kind keep a gap (ranged 3.5 m, x1.4 for spacers); each bot gets a random style (steady, fidget, drifter, spacer) with its own speed, pauses and retarget time. Aura radius 4 -> 5.5 m (was 4.8); zones shrunk again (melee u 7..12 v 16..19, ranged u 7..15 v 1..11). Test (80 runs): median nearest ranged neighbour ~5 m, under 2 m 2.5-7%, no deaths, 99.9% on side. Bots still take ~1 hit per run, all at the moment the sides flip after a teleport.

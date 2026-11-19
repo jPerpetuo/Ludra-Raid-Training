@@ -224,7 +224,7 @@ const CFG = {
     orbsAt: 3.0,            // the orbs show in Ludra's hands
     mark: 6.0,              // auras are given; the team has until `end` to split up
     end: 16.0,              // the mechanic is over: anyone still alive is clear
-    radius: 4,              // estimate: the distance at which opposite auras hurt each other
+    radius: 5.5,            // estimate: the distance at which opposite auras hurt each other (bigger = harder to keep apart)
     hands: { x: 7, y: 12, z: -26 },   // world position of Ludra's hands (blue at -x, red at +x)
     // spawns (random, at least minGap apart): you + 4 bots stay near the north wall (melee / tanks), 5 bots spread
     // across the north half between west and east, not much past the middle toward the south
@@ -235,7 +235,9 @@ const CFG = {
     // where each group may walk, in the frame of the players facing Ludra (u = toward their color's side, v = toward
     // Ludra; the room is 40 m, so 20 is a wall). Melee: 5..15 across (skipping the outer tile at each end), 10..18 deep
     // (near Ludra). Ranged: 5..18 across, -2..14 deep.
-    area: { melee: { u: [6, 13], v: [11, 18] }, ranged: { u: [6, 16], v: [0, 12] } },   // tighter than before: more pressure
+    area: { melee: { u: [7, 12], v: [16, 19] }, ranged: { u: [7, 15], v: [1, 11] } },   // melee hug the boss; tighter than before
+    // minimum distance between teammates of the same kind when picking spots: ranged spread out, melee stand in a line
+    spacing: { melee: 2.5, ranged: 3.5 },
     // teleports (placeholder timings, to be tuned from the video): Ludra vanishes at `first` s, reappears at another corner
     // `gap` s later, and the team has `adjust` s to get into place before the next teleport
     tp: { first: 12.0, gap: 1.5, adjust: 8.0 },
@@ -351,21 +353,37 @@ function colorsInArea(a, x, y) {
   const uv = uvOf(S.frame, colorsSide(a.color), x, y), r = colorsRect(a.role);
   return uv.u >= r.u[0] && uv.u <= r.u[1] && uv.v >= r.v[0] && uv.v <= r.v[1];
 }
-// a spot for an actor: random inside their area; if they're on the wrong side, the nearest point of their area
+// a spot for an actor, inside their area. Each candidate is scored: a spot next to a teammate of the same kind (closer than
+// their spacing) is heavily penalised, so after a teleport everyone spreads out again instead of stacking. From the wrong
+// side, the nearest spot wins; "drifter" bots like to cross the area; the rest pick at random among the free spots.
 function colorsGoal(a) {
   const f = S.frame, side = colorsSide(a.color), r = colorsRect(a.role);
-  let u, v;
-  if (colorsInArea(a, a.x, a.y)) {
-    u = r.u[0] + Math.random() * (r.u[1] - r.u[0]);
-    v = r.v[0] + Math.random() * (r.v[1] - r.v[0]);
-  } else {
-    const uv = uvOf(f, side, a.x, a.y);
-    u = clamp(uv.u, r.u[0], r.u[1]);
-    v = clamp(uv.v, r.v[0], r.v[1]);
+  const st = a.st || BOT_STYLES.steady;
+  const gap = (a.role === 'melee' ? CFG.colors.spacing.melee : CFG.colors.spacing.ranged) * st.gap;
+  const others = S.actors.filter((b) => b !== a && !b.dead && !b.me && b.role === a.role);
+  const wrong = !colorsInArea(a, a.x, a.y);
+  let best = null, bestScore = Infinity;
+  for (let k = 0; k < 30; k++) {
+    const u = r.u[0] + Math.random() * (r.u[1] - r.u[0]), v = r.v[0] + Math.random() * (r.v[1] - r.v[0]);
+    const p = pointOf(f, side, u, v);
+    const crowd = others.some((b) => Math.hypot(p.x - b.x, p.y - b.y) < gap || (b.goal && Math.hypot(p.x - b.goal[0], p.y - b.goal[1]) < gap));
+    const dCur = Math.hypot(p.x - a.x, p.y - a.y);
+    let score = crowd ? 100 : 0;
+    if (wrong) score += dCur;
+    else if (st.far) score -= dCur * 0.3;
+    else score += Math.random() * 2;
+    if (score < bestScore) { bestScore = score; best = p; }
   }
-  const p = pointOf(f, side, u, v);
-  return [p.x, p.y];
+  return [best.x, best.y];
 }
+// how each bot moves. Every bot gets one at random, so they don't all move the same way.
+const BOT_STYLES = {
+  steady: { spd: 0.8, wait: [1.5, 4], retarget: [4, 7], gap: 1 },        // slow, stands around for a while
+  fidget: { spd: 1.1, wait: [0.2, 0.8], retarget: [1.5, 3], gap: 1 },    // quick, short pauses, moves a lot
+  drifter: { spd: 0.9, wait: [0.5, 2], retarget: [3, 5], gap: 1, far: true }, // likes to cross the area
+  spacer: { spd: 1, wait: [0.5, 2], retarget: [3, 6], gap: 1.4 },        // keeps a bigger gap from its own kind
+};
+const randIn = (r) => r[0] + Math.random() * (r[1] - r[0]);
 // the assignment (which color takes the left) that needs the least walking from where everyone is now
 function colorsBestLeft(ci) {
   if (opts.colorsStrategy !== 'adaptive') return 'blue';
@@ -373,9 +391,15 @@ function colorsBestLeft(ci) {
   const cost = (L) => S.actors.reduce((s, a) => (a.dead ? s : s + rectDist(uvOf(f, sideOf(f, a.color, L), a.x, a.y), colorsRect(a.role))), 0);
   return cost('blue') <= cost('red') ? 'blue' : 'red';
 }
+// would a step to (x, y) bring this bot closer to someone with the opposite aura, inside the danger distance? A step that
+// moves them away is always fine, so a bot that ends up too close (after a teleport) can still walk out.
 function colorsClash(a, x, y) {
   const R = CFG.colors.radius + 0.3;   // a little margin so bots don't graze each other
-  return S.actors.some((b) => b !== a && !b.dead && b.color !== a.color && Math.hypot(x - b.x, y - b.y) < R);
+  return S.actors.some((b) => {
+    if (b === a || b.dead || b.color === a.color) return false;
+    const dNew = Math.hypot(x - b.x, y - b.y);
+    return dNew < R && dNew < Math.hypot(a.x - b.x, a.y - b.y);
+  });
 }
 // bot steering: the straight line first, then the smallest sidestep (every 0.1 rad, either way) that doesn't clash
 const SIDESTEP = [0];
@@ -406,13 +430,18 @@ function colorsSpawns() {
 function colorsState() {
   const M = CFG.colors, actors = [], spawns = colorsSpawns();
   // you, then the melee bots (north edge), then the ranged bots (spread across the north half)
+  // colors: always 5 blue and 5 red, dealt at random across the 10 players
+  const colorsDeal = Array.from({ length: spawns.length }, (_, i) => (i < spawns.length / 2 ? 'blue' : 'red'));
+  for (let i = colorsDeal.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [colorsDeal[i], colorsDeal[j]] = [colorsDeal[j], colorsDeal[i]]; }
   spawns.forEach(([x, y], i) => actors.push({ me: i === 0, role: i === 0 ? 'you' : i <= M.melee ? 'melee' : 'ranged', name: '', x, y, z: 0, vz: 0,
-    color: Math.random() < 0.5 ? 'blue' : 'red', dead: null, mark: null, ticks: 0, nextTick: 0, goal: null, goalUntil: 0, wait: 0 }));
+    color: colorsDeal[i], dead: null, mark: null, ticks: 0, nextTick: 0, goal: null, goalUntil: 0, wait: 0 }));
   // teammates get guild names, like the Bingo board
   const pool = GUILD.slice();
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
   const npcs = actors.filter((a) => !a.me), mtk = Math.floor(Math.random() * npcs.length);
   npcs.forEach((a, i) => { a.name = i === mtk ? 'mtkです' : pool.pop(); });
+  const styles = Object.keys(BOT_STYLES);
+  for (const a of npcs) { a.style = styles[Math.floor(Math.random() * styles.length)]; a.st = BOT_STYLES[a.style]; }
   const me = actors[0];
   me.name = 'you';
   // stage 1 = Ludra north. Each teleport: she vanishes, reappears at another corner after `gap`, and the team has `adjust`
@@ -452,13 +481,13 @@ function colorsStep(t, P, inv, A, dt) {
     for (const a of S.actors) {
       if (a.me || a.dead) continue;
       if (a.wait > 0) { a.wait -= dt; a.ref = null; continue; }
-      if (a.goal && Math.hypot(a.goal[0] - a.x, a.goal[1] - a.y) < 0.3) { a.goal = null; a.wait = 0.5 + Math.random() * 2; a.ref = null; continue; }
+      if (a.goal && Math.hypot(a.goal[0] - a.x, a.goal[1] - a.y) < 0.3) { a.goal = null; a.wait = randIn(a.st.wait); a.ref = null; continue; }
       // a new spot every few seconds, but not while they're still on the wrong side: they keep heading for their side
-      if (!a.goal || (t >= a.goalUntil && colorsInArea(a, a.x, a.y))) { a.goal = colorsGoal(a); a.goalUntil = t + 3 + Math.random() * 3; }
+      if (!a.goal || (t >= a.goalUntil && colorsInArea(a, a.x, a.y))) { a.goal = colorsGoal(a); a.goalUntil = t + randIn(a.st.retarget); }
       const dx = a.goal[0] - a.x, dy = a.goal[1] - a.y, d = Math.hypot(dx, dy);
       let base = Math.atan2(dy, dx);
       if (t < (a.detour || 0)) base += a.side * Math.PI / 2;   // walking around a crowd that blocks the straight way
-      const step = Math.min(M.speed * dt, d);
+      const step = Math.min(M.speed * a.st.spd * dt, d);
       for (const off of SIDESTEP) {
         const ang = base + off, nx = a.x + Math.cos(ang) * step, ny = a.y + Math.sin(ang) * step;
         if (!colorsClash(a, nx, ny)) { a.x = nx; a.y = ny; break; }
@@ -466,7 +495,7 @@ function colorsStep(t, P, inv, A, dt) {
       // stuck: after 0.8 s without getting at least 0.6 m away from where they were (e.g. jammed against the other color
       // on the wrong side), walk around the crowd for a moment and pick a new spot
       if (!a.ref || t - a.ref.t >= 0.8) {
-        if (a.ref && Math.hypot(a.x - a.ref.x, a.y - a.ref.y) < 0.6) { a.side = Math.random() < 0.5 ? 1 : -1; a.detour = t + 1.2; a.goal = colorsGoal(a); a.goalUntil = t + 3 + Math.random() * 3; }
+        if (a.ref && Math.hypot(a.x - a.ref.x, a.y - a.ref.y) < 0.6) { a.side = Math.random() < 0.5 ? 1 : -1; a.detour = t + 1.2; a.goal = colorsGoal(a); a.goalUntil = t + randIn(a.st.retarget); }
         a.ref = { x: a.x, y: a.y, t };
       }
     }
