@@ -37,6 +37,7 @@
   #menu.off { display:none; }
   .wrap { width:100%; max-width:640px; margin:auto 0; display:flex; flex-direction:column; gap:14px; }
   .mhead { text-align:center; } .mhead .sub { margin-top:4px; }
+  .demo { width:100%; border-radius:8px; border:1px solid var(--line); background:#06070c; }
   .tabs { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
   .tabs button { flex:1 1 160px; max-width:240px; padding:11px 14px; border:1px solid var(--line); border-radius:10px; background:#111722; color:var(--dim); font:600 15px system-ui,sans-serif; cursor:pointer; }
   .tabs button:hover { color:var(--text); }
@@ -90,6 +91,7 @@
     <nav class="tabs" id="tabs"><button type="button" data-tab="cardZikel">Zikel</button><button type="button" data-tab="cardBingo">Bingo board</button><button type="button" data-tab="cardColors">Colors</button></nav>
     <div class="cards">
       <section class="card" id="cardZikel">
+        <img class="demo" src="docs/demo/zikel.gif" alt="Zikel demo" loading="lazy">
         <div><h2>Zikel</h2><div class="sub">Orange lines · laser walls · hard-mode circles</div></div>
         <div><div class="label">Mode</div><div class="seg" id="mode"><button data-v="0">Normal</button><button data-v="1" class="hard">Hard</button></div></div>
         <div class="row"><button id="go" class="go">Start</button></div>
@@ -100,6 +102,7 @@
           <div><span class="dot" style="background:var(--orange)"></span>Hard: leave the circle before it fills, or dodge</div></div>
       </section>
       <section class="card" id="cardBingo">
+        <img class="demo" src="docs/demo/bingo.gif" alt="Bingo board demo" loading="lazy">
         <div><h2>Bingo board</h2><div class="sub">Sweep the board with your team · find the safe square</div></div>
         <div><div class="label">Your corner</div><div class="seg" id="bCorner"><button data-v="1">1 · SW</button><button data-v="2">2 · NW</button><button data-v="3">3 · NE</button><button data-v="4">4 · SE</button></div></div>
         <div><div class="label">Your role</div><div class="seg" id="bRole"><button data-v="outside">Outside</button><button data-v="inside">Inside</button><button data-v="center">Center (orb)</button></div></div>
@@ -116,6 +119,7 @@
         <div class="note">Phase 1 board. Your 9 teammates are bots.</div>
       </section>
       <section class="card" id="cardColors">
+        <img class="demo" src="docs/demo/colors.gif" alt="Colors demo" loading="lazy">
         <div><h2>Colors</h2><div class="sub">Ludra's blue and red orbs · split by aura, keep away from the other color</div></div>
         <div><div class="label">Strategy</div><div class="seg" id="cStrategy"><button data-v="fixed">Fixed · blue left, red right</button><button data-v="adaptive">Adaptive · least walking</button></div></div>
         <div class="row"><button id="goColors" class="go">Start</button></div>
