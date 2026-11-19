@@ -1162,7 +1162,7 @@ function syncColors(t, P) {
     au.dots.forEach((d, k) => { const ang = t * 3.2 + k * 2.094; d.material.color.copy(col); d.position.set(Math.cos(ang) * 0.95, 0.9, Math.sin(ang) * 0.95); });
     fld.position.set(x, 0, y);
     const hot = colorsClash(a, x, y);
-    fld.material.color.setHex(hot ? 0xff2a3a : MAG_COL[a.color]); fld.material.opacity = hot ? 0.35 + 0.15 * Math.sin(t * 20) : 0.12;
+    fld.material.color.setHex(hot ? 0xff2a3a : MAG_COL[a.color]); fld.material.opacity = hot ? 0.3 + 0.06 * Math.sin(t * 5) : 0.12;   // slow, gentle pulse (a fast one looked like flicker)
   }
   for (; bi < bots.length; bi++) bots[bi].visible = tags[bi].visible = false;
 }
