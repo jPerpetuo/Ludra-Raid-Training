@@ -1107,7 +1107,9 @@ const magAuras = Array.from({ length: MAXA }, () => {
   const ring = ground(new THREE.RingGeometry(0.95, 1.1, 40).rotateX(-Math.PI / 2), flat(0xffffff, 0.9, { blending: ADD }), 0.08, 7);
   g.add(ring); g.visible = false; scene.add(g); return { g, dots, ring };
 });
-const magFields = Array.from({ length: MAXA }, () => { const m = ground(new THREE.CircleGeometry(CFG.colors.radius, 48).rotateX(-Math.PI / 2), flat(0xffffff, 0.12), 0.05, 2); m.visible = false; scene.add(m); return m; });
+// the field is one square with a soft round alpha texture (a triangle fan showed faint seams as streaks when transparent)
+const fieldTex = canvasTex(128, 128, (g, w, h) => { const gr = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.92, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+const magFields = Array.from({ length: MAXA }, () => { const R2 = CFG.colors.radius * 2; const m = ground(new THREE.PlaneGeometry(R2, R2).rotateX(-Math.PI / 2), flat(0xffffff, 0.12, { map: fieldTex }), 0.05, 2); m.visible = false; scene.add(m); return m; });
 // fade Ludra in or out (every material of her model; made transparent the first time)
 function setLudraFade(op) {
   if (!ludra._mats) { ludra._mats = []; ludra.traverse((o) => { if (o.material) for (const m of [].concat(o.material)) { m.transparent = true; ludra._mats.push(m); } }); }
