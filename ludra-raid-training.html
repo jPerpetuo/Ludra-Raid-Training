@@ -316,9 +316,7 @@ const saveOpts = () => { try { localStorage.zikelTrainer = JSON.stringify(opts);
 const cam = { yaw: 0, pitch: CFG.camera.pitch, dist: CFG.camera.distance };
 const SIDE = { 0: 'north', 90: 'east', 180: 'south', 270: 'west' };
 let S = null, endedAt = 0, menuOpen = true;
-const GUILD = ['Sulong', 'Sete', 'zPedra', 'Khorham', 'SharkAll', 'Daniel', 'Skazy', 'Chryver', 'Penha', 'ASMRespirito', 'guimaZ',
-  'Comac', 'Brownie', 'Delta', 'Young', 'Seraaph', 'Seithr', 'OguriCap', 'ArrancaPau', 'Hades', 'Tayx', 'Ludin', 'SongWeaver', 'BrunnO',
-  'Kalard', 'Divinothy', 'Amandinha', 'Lsntn', 'Sexy', 'Takeshão', 'Wintersoldier96', 'Officer do Sartore', 'Hendyel', 'mtkです'];   // mtkです is in the random pool too
+const GUILD = ['Kalard', 'Divinothy', 'Amandinha', 'Lsntn', 'Sexy', 'Takeshão', 'Wintersoldier96', 'Officer do Sartore', 'Hendyel'];   // the only teammate names: 9 bots, drawn at random every run
 
 function baseState(mech, start, end) {
   return { mech, phase: 'run', t: 0, end, lines: [], sweeps: [], circles: [], drops: [], filled: [], fails: [], hard: opts.hard,
