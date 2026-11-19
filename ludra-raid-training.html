@@ -1164,11 +1164,11 @@ function syncColors(t, P) {
     au.dots.forEach((d, k) => { const ang = t * 3.2 + k * 2.094; d.material.color.copy(col); d.position.set(Math.cos(ang) * 0.95, 0.9, Math.sin(ang) * 0.95); });
     fld.position.set(x, 0, y);
     // how close the nearest opposite aura is, as a smooth 0..1 value (a yes/no switch flipped every frame near the edge
-    // and made the field flicker): it turns from its colour to red and gets stronger as they get closer
-    const dmin = S.actors.reduce((m, b) => (b === a || b.dead || b.color === a.color ? m : Math.min(m, Math.hypot(x - b.x, y - b.y))), 99);
+    // how close the nearest opposite aura is, as a smooth 0..1 value (a yes/no switch flipped every frame near the edge
+    // and made the field flicker). Only its strength changes with distance.
     const near = Math.min(1, Math.max(0, (M.radius + 2 - dmin) / 2));
-    fld.material.color.copy(new THREE.Color(MAG_COL[a.color]).lerp(new THREE.Color(0xff2a3a), near));
-    fld.material.opacity = 0.12 + 0.2 * near;
+    fld.material.color.setHex(MAG_COL[a.color]);   // the field always keeps its own colour (no colour swaps mid-fight)
+    fld.material.opacity = 0.12 + 0.12 * near;   // closer to the other colour = a bit stronger
   }
   for (; bi < bots.length; bi++) bots[bi].visible = tags[bi].visible = false;
 }
