@@ -121,7 +121,7 @@
       <section class="card" id="cardColors">
         <img class="demo" src="docs/demo/colors.gif" alt="Colors demo" loading="lazy">
         <div><h2>Colors</h2><div class="sub">Ludra's blue and red orbs · split by aura, keep away from the other color</div></div>
-        <div><div class="label">Strategy</div><div class="seg" id="cStrategy"><button data-v="fixed">Fixed · blue left, red right</button><button data-v="adaptive">Adaptive · least walking</button></div></div>
+        <div><div class="label">Strategy</div><div class="seg" id="cStrategy"><button data-v="adaptive">Adaptive · least walking</button><button data-v="fixed">Fixed · blue left, red right</button></div></div>
         <div class="row"><button id="goColors" class="go">Start</button></div>
         <div><div class="label">How it works</div>
           <div><span class="dot" style="background:#4a8dff"></span>Ludra holds a blue orb (left hand) and a red one (right hand)</div>
@@ -308,7 +308,7 @@ const cv = $('c');
 const HALF = CFG.arenaSize / 2, STEP = 1 / 120;
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const keys = new Set();
-const opts = { hard: false, speed: 1, keep: false, sens: 1, callouts: true, mech: 'zikel', bCorner: 1, bRole: 'outside', colorsStrategy: 'fixed', lang: null };
+const opts = { hard: false, speed: 1, keep: false, sens: 1, callouts: true, mech: 'zikel', bCorner: 1, bRole: 'outside', colorsStrategy: 'adaptive', lang: null };
 try { Object.assign(opts, JSON.parse(localStorage.zikelTrainer || '{}')); } catch {}
 LANG = opts.lang || 'pt';   // Portuguese by default; the flags switch it
 if (opts.bRole === 'melee') opts.bRole = 'outside'; else if (opts.bRole === 'ranged') opts.bRole = 'inside'; else if (opts.bRole === 'centre') opts.bRole = 'center';   // older saved settings
