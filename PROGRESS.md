@@ -36,7 +36,7 @@ Mechanic references (keep them in sync when numbers change): `ludra-zikel-mechan
 - Real timings for the Colors orbs, auras and flights (placeholders for now: 12 s, 1.5 s gap, 8 s, 0.9 s flight).
 - Sides after a flight in adaptive mode: "least walking" is a guess.
 - Bingo phase 2.
-- Teammate names: guild names are kept as they are, and the player shows as "you" / "você".
+- Teammate names: the nine names in `GUILD` (Kalard's friends), drawn at random every run. The player shows as "you" / "você".
 
 ## Known limits
 

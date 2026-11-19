@@ -105,7 +105,7 @@ Anyone can use this tool, share it with their static or legion, and improve on i
 ## Credits
 
 Original trainer by **mtkです** of the **[Siel]** server (South America), with mechanic timings checked frame by frame
-against raid videos. The teammates in the Bingo board and Colors trainers carry the names of mtkです's guildmates.
+against raid videos. The nine teammates in the Bingo board and Colors trainers are named after Kalard's friends, drawn at random every run.
 
 Fork by **Kalard** of the **[Marchutan]** server.
 

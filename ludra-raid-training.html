@@ -355,7 +355,7 @@ function newRun(mech) {
       let v; do v = 1 + Math.floor(Math.random() * 4); while (breaths.length && v === breaths[breaths.length - 1].v);
       breaths.push(makeBreath(v, tm));
     }
-    // teammates get guild names: mtkです always, the rest picked at random
+    // teammates get names from GUILD, drawn at random every run
     const pool = GUILD.slice();
     for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
     const npcs = actors.filter((a) => !a.me);
@@ -489,7 +489,7 @@ function colorsState() {
   for (let i = colorsDeal.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [colorsDeal[i], colorsDeal[j]] = [colorsDeal[j], colorsDeal[i]]; }
   spawns.forEach(([x, y], i) => actors.push({ me: i === 0, role: i === 0 ? T('you') : i <= M.melee ? 'melee' : 'ranged', name: '', x, y, z: 0, vz: 0,
     color: colorsDeal[i], dead: null, mark: null, ticks: 0, nextTick: 0, goal: null, goalUntil: 0, wait: 0 }));
-  // teammates get guild names, like the Bingo board
+  // teammates get names from GUILD, like the Bingo board
   const pool = GUILD.slice();
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
   const npcs = actors.filter((a) => !a.me);
@@ -1066,7 +1066,7 @@ const tagTex = new Map();
 const nameTag = (name) => {
   if (!tagTex.has(name)) tagTex.set(name, canvasTex(256, 64, (g, w, h) => {
     g.font = '700 30px system-ui,"Segoe UI","Yu Gothic UI","Meiryo",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.85)'; g.strokeText(name, w / 2, h / 2); g.fillStyle = name === 'mtkです' ? '#ffd56b' : '#dfe6f3'; g.fillText(name, w / 2, h / 2);
+    g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.85)'; g.strokeText(name, w / 2, h / 2); g.fillStyle = '#dfe6f3'; g.fillText(name, w / 2, h / 2);
   }));
   return tagTex.get(name);
 };
