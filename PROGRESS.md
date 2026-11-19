@@ -135,3 +135,4 @@ directory listing at `/` because the file is no longer `index.html`; rename or a
 - Menu and page text: `applyHtmlLang()` swaps the text nodes (dictionary `PT_HTML`). Code strings: wrapped in `L(...)` with dictionary `PT_JS`.
 - Checked in the browser: menu, Colors HUD and callouts in Portuguese. Not yet checked: every Zikel and Bingo message in Portuguese.
 - Teleports never go to the opposite corner (N to S, W to E). From N she goes W or E; from W or E she goes N or S. Test: 546 jumps in 300 runs, 0 opposite.
+- Bots can no longer leave the arena (steps are clamped to the arena). Ludra flies up 14 m while fading out (0.9 s) before the gap, and flies down while fading in at the new corner. Placeholder timings.

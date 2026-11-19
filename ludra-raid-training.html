@@ -517,7 +517,7 @@ function colorsStep(t, P, inv, A, dt) {
       if (t < (a.detour || 0)) base += a.side * Math.PI / 2;   // walking around a crowd that blocks the straight way
       const step = Math.min(M.speed * a.st.spd * dt, d);
       for (const off of SIDESTEP) {
-        const ang = base + off, nx = a.x + Math.cos(ang) * step, ny = a.y + Math.sin(ang) * step;
+        const ang = base + off, nx = clamp(a.x + Math.cos(ang) * step, -HALF + 1, HALF - 1), ny = clamp(a.y + Math.sin(ang) * step, -HALF + 1, HALF - 1);   // never out of the arena
         if (!colorsClash(a, nx, ny)) { a.x = nx; a.y = ny; break; }
       }
       // stuck: after 0.8 s without getting at least 0.6 m away from where they were (e.g. jammed against the other color
@@ -1080,17 +1080,31 @@ const magAuras = Array.from({ length: MAXA }, () => {
   g.add(ring); g.visible = false; scene.add(g); return { g, dots, ring };
 });
 const magFields = Array.from({ length: MAXA }, () => { const m = ground(new THREE.CircleGeometry(CFG.colors.radius, 48).rotateX(-Math.PI / 2), flat(0xffffff, 0.12), 0.05, 2); m.visible = false; scene.add(m); return m; });
+// fade Ludra in or out (every material of her model; made transparent the first time)
+function setLudraFade(op) {
+  if (!ludra._mats) { ludra._mats = []; ludra.traverse((o) => { if (o.material) for (const m of [].concat(o.material)) { m.transparent = true; ludra._mats.push(m); } }); }
+  for (const m of ludra._mats) m.opacity = op;
+}
 function syncColors(t, P) {
   const M = CFG.colors, isM = !!S && S.mech === 'colors';
   if (!isM) {   // other mechanics: keep the colors objects hidden and leave the bots alone
     for (const g of magOrbs) g.visible = false;
     for (let i = 0; i < MAXA; i++) { magAuras[i].g.visible = false; magFields[i].visible = false; }
+    ludra.visible = true; setLudraFade(1);
     return;
   }
-  // Ludra: north at the start, then at her corner after each teleport (hidden while she's away)
-  const C = S.frame.g, L = 32;   // 32 = how far she is from the middle of the room
-  ludra.visible = !S.hidden;
-  ludra.position.set(C.x * L, 0, C.y * L);
+  // Ludra: north at the start. Each teleport she flies up and fades out, is gone for the gap, then flies down and fades
+  // in at her new corner. Placeholder timings: FLY seconds per move, UP metres of lift.
+  const C = S.frame.g, L = 32, FLY = 0.9, UP = 14;   // L = how far she is from the middle of the room
+  let vis = true, lift = 0, op = 1;
+  for (const ev of S.tps) {
+    if (t >= ev.vanish && t < ev.vanish + FLY) { const k = (t - ev.vanish) / FLY; lift = UP * k; op = 1 - k; }
+    else if (t >= ev.vanish + FLY && t < ev.reappear) vis = false;
+    else if (t >= ev.reappear && t < ev.reappear + FLY) { const k = (t - ev.reappear) / FLY; lift = UP * (1 - k); op = k; }
+  }
+  ludra.visible = vis;
+  ludra.position.set(C.x * L, lift, C.y * L);
+  setLudraFade(op);
   ludra.rotation.set(0, Math.atan2(-C.x, -C.y), 0);   // her face toward the room
   const orbOn = t >= M.orbsAt && t < M.mark + 0.6;
   for (const g of magOrbs) {
@@ -1460,7 +1474,7 @@ $('lang').addEventListener('click', (e) => { if (e.target.dataset.v) { LANG = op
 $('cStrategy').addEventListener('click', (e) => { if (e.target.dataset.v) { opts.colorsStrategy = e.target.dataset.v; saveOpts(); syncUI(); } });
 $('resume').addEventListener('click', closeMenu);
 
-window.zikel = { CFG, opts, cam, STEP, newRun, update, sync, hud, get S() { return S; }, render: () => { sync(); hud(); renderer.render(scene, camera); } };
+window.zikel = { CFG, opts, cam, ludra, STEP, newRun, update, sync, hud, get S() { return S; }, render: () => { sync(); hud(); renderer.render(scene, camera); } };
 $('dodge').style.setProperty('--seg', (CFG.dodge.cost / CFG.dodge.stamina * 100) + '%');
 applyHtmlLang();
 syncUI(); resize(); requestAnimationFrame(frame);
