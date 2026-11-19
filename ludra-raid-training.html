@@ -37,9 +37,12 @@
   #menu.off { display:none; }
   .wrap { width:100%; max-width:1120px; margin:auto 0; display:flex; flex-direction:column; gap:14px; }
   .mhead { text-align:center; } .mhead .sub { margin-top:4px; }
-  .cards { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; }
-  @media (max-width:1000px) { .cards { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
-  @media (max-width:700px) { .cards { grid-template-columns:1fr; } }
+  .tabs { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .tabs button { flex:1 1 160px; max-width:240px; padding:11px 14px; border:1px solid var(--line); border-radius:10px; background:#111722; color:var(--dim); font:600 15px system-ui,sans-serif; cursor:pointer; }
+  .tabs button:hover { color:var(--text); }
+  .tabs button.on { background:var(--violet); border-color:var(--violet); color:#fff; }
+  .cards > .card { display:none; }
+  .cards > .card.on { display:flex; }
   .card { padding:20px; background:var(--panel); border:1px solid var(--line); border-radius:12px; display:flex; flex-direction:column; gap:14px; }
   .card.soon { border-style:dashed; } .card.soon p { margin:0; color:var(--dim); } .card.soon .row { margin-top:auto; }
   .shared { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:14px 28px; }
@@ -84,6 +87,7 @@
   <div class="wrap">
     <header class="mhead"><h1>Ludra Raid Training</h1><div class="sub">Sanctuary raid · pick a mechanic to practice</div><div class="credit">Original by <b>mtkです</b> [Siel] · fork by <b>Kalard</b> [Marchutan]</div><div id="err"></div></header>
     <div class="row" id="resumeRow"><button id="resume">Resume</button></div>
+    <nav class="tabs" id="tabs"><button type="button" data-tab="cardZikel">Zikel</button><button type="button" data-tab="cardBingo">Bingo board</button><button type="button" data-tab="cardColors">Colors</button></nav>
     <div class="cards">
       <section class="card" id="cardZikel">
         <div><h2>Zikel</h2><div class="sub">Orange lines · laser walls · hard-mode circles</div></div>
@@ -149,7 +153,13 @@ const PT_JS = {"Ludra's Trial":"Julgamento da Ludra","Center A":"Centro A","Cent
 const PT_HTML = {"Ludra's Trial":"Julgamento da Ludra","STAMINA":"STAMINA","Ludra Raid Training":"Treino de Raid da Ludra","Sanctuary raid · pick a mechanic to practice":"Raid Santuário · escolha uma mecânica para treinar","Original by":"Original de","[Siel] · fork by":"[Siel] · fork por","Resume":"Continuar","Zikel":"Zikel","Orange lines · laser walls · hard-mode circles":"Linhas laranja · paredes de laser · círculos do modo difícil","Mode":"Modo","Normal":"Normal","Hard":"Difícil","How it works":"Como funciona","Orange line: stay out until it strikes":"Linha laranja: fique fora até ela atingir","Then step onto it before the arena detonates":"Depois, pise nela antes da arena explodir","Stand in a gap as the lasers pass":"Fique numa brecha quando os lasers passarem","Hard: leave the circle before it fills, or dodge":"Difícil: saia do círculo antes de encher, ou esquive","Bingo board":"Tabuleiro Bingo","Sweep the board with your team · find the safe square":"Varra o tabuleiro com seu time · ache o quadrado seguro","Your corner":"Seu canto","Your role":"Sua função","Outside":"Externo","Inside":"Interno","Center (orb)":"Centro (orbe)","Start":"Começar","A circle follows each player: hold your square":"Um círculo segue cada jogador: segure seu quadrado","When it turns red it stays put: move to your next square":"Quando ficar vermelho, para: vá ao seu próximo quadrado","One random square is safe: a glass box shows when found":"Um quadrado aleatório é seguro: uma caixa de vidro aparece quando é achado","Then everyone runs into it: inside you take no damage":"Depois todo mundo corre para dentro: lá dentro você não leva dano","When Ludra's Trial ends, anyone outside it dies":"Quando o Julgamento da Ludra acaba, quem está fora morre","Avoid everyone's circles · perfect dodge works at the end":"Evite os círculos de todos · esquiva perfeita funciona no fim","Center: jump into your orb (Space) before it lands":"Centro: pule na sua orbe (Espaço) antes de ela cair","Phase 1 board. Your 9 teammates are bots.":"Tabuleiro da fase 1. Seus 9 companheiros são bots.","Colors":"Cores","Ludra's blue and red orbs · split by aura, keep away from the other color":"Orbes azul e vermelha da Ludra · divida-se pela aura e fique longe da outra cor","Strategy":"Estratégia","Fixed · blue left, red right":"Fixa · azul à esquerda, vermelho à direita","Adaptive · least walking":"Adaptativa · menos caminhada","Ludra holds a blue orb (left hand) and a red one (right hand)":"A Ludra segura uma orbe azul (mão esquerda) e uma vermelha (mão direita)","Everyone gets a random aura: blue goes west, red goes east":"Todos recebem uma aura aleatória: azul vai para o oeste, vermelho para o leste","Too close to an opposite aura hurts both of you":"Perto demais de uma aura oposta fere os dois","Same colors can stand together":"Cores iguais podem ficar juntas","Timings and distances are estimates. Your 9 teammates are bots.":"Tempos e distâncias são estimativas. Seus 9 companheiros são bots.","Speed":"Velocidade","Language":"Idioma","Show callouts":"Mostrar avisos","Keep going after a mistake":"Continuar depois de um erro","Mouse sensitivity":"Sensibilidade do mouse","Controls":"Controles","Move (relative to camera)":"Mover (em relação à câmera)","Look · wheel zooms":"Olhar · roda aproxima","Dodge (uses stamina)":"Esquivar (usa stamina)","Jump":"Pular","Restart":"Reiniciar","This menu":"Este menu","Original by mtkです [Siel] · fork by Kalard [Marchutan]":"Original de mtkです [Siel] · fork por Kalard [Marchutan]","Unofficial fan-made practice tool. Not affiliated with NCSOFT.":"Ferramenta de treino não oficial, feita por fãs. Não é afiliada à NCSOFT.","Could not load the 3D library. Check your internet connection and reload.":"Não foi possível carregar a biblioteca 3D. Verifique sua conexão e recarregue."};
 const L = (s) => (LANG === 'pt' && PT_JS[s]) || s;
 // two flags, always both visible: the active language is in colour, the other one is greyed out (see .langbtns CSS)
-const FLAG_US = '<svg viewBox="0 0 30 20" preserveAspectRatio="none"><rect width="30" height="20" fill="#fff"/>' + [0, 2, 4, 6].map((i) => '<rect y="' + (i * 20 / 7).toFixed(2) + '" width="30" height="' + (20 / 7).toFixed(2) + '" fill="#b22234"/>').join('') + '<rect width="13" height="10" fill="#3c3b6e"/></svg>';
+// the mechanic cards: one shown at a time, picked with the tabs above them
+function showMenuTab(id) {
+  opts.menuTab = id; saveOpts();
+  for (const c of $('menu').querySelectorAll('.cards > .card')) c.classList.toggle('on', c.id === id);
+  for (const b of $('tabs').children) b.classList.toggle('on', b.dataset.tab === id);
+}
+const FLAG_US ='<svg viewBox="0 0 30 20" preserveAspectRatio="none"><rect width="30" height="20" fill="#fff"/>' + [0, 2, 4, 6].map((i) => '<rect y="' + (i * 20 / 7).toFixed(2) + '" width="30" height="' + (20 / 7).toFixed(2) + '" fill="#b22234"/>').join('') + '<rect width="13" height="10" fill="#3c3b6e"/></svg>';
 const FLAG_BR = '<svg viewBox="0 0 30 20" preserveAspectRatio="none"><rect width="30" height="20" fill="#009c3b"/><polygon points="15,2 27,10 15,18 3,10" fill="#ffdf00"/><circle cx="15" cy="10" r="4.2" fill="#002776"/></svg>';
 function setLangButton() {
   const bs = $('langBtns').children;
@@ -1492,6 +1502,8 @@ window.zikel = { CFG, opts, cam, ludra, STEP, newRun, update, sync, hud, get S()
 $('dodge').style.setProperty('--seg', (CFG.dodge.cost / CFG.dodge.stamina * 100) + '%');
 applyHtmlLang();
 setLangButton();
+$('tabs').addEventListener('click', (e) => { const id = e.target.closest('button')?.dataset.tab; if (id) showMenuTab(id); });
+showMenuTab(opts.menuTab || 'cardZikel');
 syncUI(); resize(); requestAnimationFrame(frame);
 </script>
 </body>
