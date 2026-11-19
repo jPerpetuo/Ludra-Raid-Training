@@ -129,3 +129,9 @@ directory listing at `/` because the file is no longer `index.html`; rename or a
 - Spacing (`CFG.colors.spacing`): ranged spots keep 3.5 m from other ranged bots, melee 2.5 m. Melee now hug the boss (v 16..19). Test (80 runs): median nearest ranged neighbour 6.8 m at 10 s, 7% under 2 m; 100% on side; no hits.
 
 - Stacking fixed: spots are scored, teammates of the same kind keep a gap (ranged 3.5 m, x1.4 for spacers); each bot gets a random style (steady, fidget, drifter, spacer) with its own speed, pauses and retarget time. Aura radius 4 -> 5.5 m (was 4.8); zones shrunk again (melee u 7..12 v 16..19, ranged u 7..15 v 1..11). Test (80 runs): median nearest ranged neighbour ~5 m, under 2 m 2.5-7%, no deaths, 99.9% on side. Bots still take ~1 hit per run, all at the moment the sides flip after a teleport.
+
+## Portuguese (2026-11-19)
+- Language switch in the Settings card (English / Português). Starts in Portuguese if the browser is set to pt-*, otherwise English; saved with the other settings.
+- Menu and page text: `applyHtmlLang()` swaps the text nodes (dictionary `PT_HTML`). Code strings: wrapped in `L(...)` with dictionary `PT_JS`.
+- Checked in the browser: menu, Colors HUD and callouts in Portuguese. Not yet checked: every Zikel and Bingo message in Portuguese.
+- Teleports never go to the opposite corner (N to S, W to E). From N she goes W or E; from W or E she goes N or S. Test: 546 jumps in 300 runs, 0 opposite.

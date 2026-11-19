@@ -118,6 +118,7 @@
     </div>
     <section class="card shared">
       <div class="col">
+        <div><div class="label">Language</div><div class="seg" id="lang"><button data-v="en">English</button><button data-v="pt">Português</button></div></div>
         <div><div class="label">Speed</div><div class="seg" id="speed"><button data-v="0.5">50%</button><button data-v="0.75">75%</button><button data-v="1">100%</button></div></div>
         <label class="chk"><input type="checkbox" id="callouts"> Show callouts</label>
         <label class="chk"><input type="checkbox" id="keep"> Keep going after a mistake</label>
@@ -132,6 +133,31 @@
 <script>setTimeout(() => { if (!window.zikel) document.getElementById('err').textContent = 'Could not load the 3D library. Check your internet connection and reload.'; }, 6000);</script>
 <script type="module">
 import * as THREE from 'three';
+
+// ----------------------------------------------------------------------------
+// Language: English (default) or Português. L(text) returns the Portuguese for a string literal in the code; the menu and
+// the page text are translated by applyHtmlLang(). The chosen language is saved with the other settings.
+// ----------------------------------------------------------------------------
+let LANG = 'en';
+const PT_JS = {"Ludra's Trial":"Julgamento da Ludra","Center A":"Centro A","Center B":"Centro B","Outside ":"Externo ","Inside ":"Interno ","Center (orb)":"Centro (orbe)","Corner ":"Canto ","BLUE":"AZUL","RED":"VERMELHO","NORTH":"NORTE","SOUTH":"SUL","WEST":"OESTE","EAST":"LESTE","Aura ":"Aura ","Hit ":"Acerto "," times by the other color's aura: too many hits":" vezes pela aura da outra cor: acertos demais","Ludra's breath hit you":"O sopro da Ludra te acertou"," (the safe square was found on the last circle: very hard to reach in time)":" (o quadrado seguro foi achado no último círculo: muito difícil chegar a tempo)","Your orb reached the ground before you grabbed it":"Sua orbe chegou ao chão antes de você pegá-la","Circle ":"Círculo ",": hit by ":": atingido por ","your own circle":"o seu próprio círculo","'s circle":" do círculo dele","Ludra's Trial ended and the safe square was never found":"O Julgamento da Ludra acabou e o quadrado seguro nunca foi achado",": it was your square on circle ":": era o seu quadrado no círculo ",", and your circle landed outside it":", e o seu círculo caiu fora dele"," (it was found on the last circle: from far away it can't be reached in time)":" (foi achado no último círculo: de longe não dá para chegar a tempo)","Ludra's Trial: the meteor hit you outside the safe square":"Julgamento da Ludra: o meteoro te acertou fora do quadrado seguro","Line ":"Linha ",": standing on the orange line when it struck":": estava em cima da linha laranja quando ela atingiu",": not on the line when the arena detonated":": não estava na linha quando a arena explodiu",": inside the orange circle when it filled":": estava dentro do círculo laranja quando ele encheu","Lasers from the ":"Lasers do lado "," (after line ":" (depois da linha ","): hit by a beam":"): atingido por um feixe","LUDRA":"LUDRA","Ludra charges the orbs":"A Ludra está carregando as orbes","Stage ":"Fase ","  ·  Hits ":"  ·  Acertos ","Get ready":"Prepare-se","BINGO BOARD  ·  ":"TABULEIRO BINGO  ·  ","COLORS  ·  ":"CORES  ·  ","HARD":"DIFÍCIL","NORMAL":"NORMAL","  ·  Mistakes: ":"  ·  Erros: ","R or Enter to retry  ·  Esc for settings":"R ou Enter para tentar de novo  ·  Esc para configurações","Safe square found by ":"Quadrado seguro achado por ","YOU DIED":"VOCÊ MORREU","Your circle missed your square on circle ":"Seu círculo errou o seu quadrado no círculo ",". It wasn't the safe square, so it didn't cost the team this time.\n":". Não era o quadrado seguro, então dessa vez não custou ao time.\n","No mistakes.\n":"Nenhum erro.\n","CLEARED":"CONCLUÍDO"," MISTAKES":" ERROS"," MISTAKE":" ERRO","LUDRA CHARGES THE ORBS":"A LUDRA CARREGA AS ORBES","Blue orb in her left hand · red in her right":"Orbe azul na mão esquerda · vermelha na direita","LUDRA IS TELEPORTING":"A LUDRA ESTÁ TELETRANSPORTANDO","TOO CLOSE: MOVE AWAY FROM THE ":"PERTO DEMAIS: AFASTE-SE DAS AURAS "," AURAS":"","YOU ARE ":"VOCÊ É ",": GO ":": VÁ PARA O ","STAY ON YOUR SIDE (":"FIQUE NO SEU LADO (","Your aura: ":"Sua aura: "," · keep away from the other color":" · fique longe da outra cor","Breath from the ":"Sopro vindo do canto ","south-west":"sudoeste","north-west":"noroeste","north-east":"nordeste","south-east":"sudeste"," corner":"",": you're safe in here":": você está seguro aqui","BREATH: RUN IN NOW":"SOPRO: CORRA PARA DENTRO AGORA","You can make it before the breath starts":"Você consegue chegar antes do sopro começar","BREATH: GET OUT OF IT":"SOPRO: SAIA DELE","BREATH: STEP OUT OF THE ORANGE":"SOPRO: SAIA DA FAIXA LARANJA","BREATH: GO TO THE FAR CORNER":"SOPRO: VÁ PARA O CANTO DISTANTE","BREATH: HOLD THE FAR CORNER":"SOPRO: SEGURE O CANTO DISTANTE","BREATH: DON'T CROSS IT YET":"SOPRO: NÃO ATRAVESSE AINDA","Go to the safe square once the breath ends":"Vá para o quadrado seguro quando o sopro acabar","BREATH SOON: DON'T CUT THROUGH THE MIDDLE":"SOPRO LOGO: NÃO CORTE PELO MEIO","GET OUT OF YOUR CIRCLE":"SAIA DO SEU CÍRCULO","DROP YOUR CIRCLE BESIDE THE ORB":"SOLTE SEU CÍRCULO AO LADO DA ORBE","WAIT: ORB TOO HIGH":"ESPERE: ORBE MUITO ALTA","JUMP INTO THE ORB (SPACE)":"PULE NA ORBE (ESPAÇO)","GET OUT OF THE RED CIRCLE":"SAIA DO CÍRCULO VERMELHO","METEOR: GET IN THE SAFE SQUARE":"METEORO: ENTRE NO QUADRADO SEGURO","SAFE: STAY INSIDE":"SEGURO: FIQUE DENTRO","RUN TO THE SAFE SQUARE":"CORRA PARA O QUADRADO SEGURO","Meteor incoming: it kills everyone outside the safe square":"Meteoro chegando: mata todo mundo fora do quadrado seguro","Red circles on the way: go around or wait for them to pop":"Círculos vermelhos no caminho: contorne ou espere estourarem","HOLD YOUR SQUARE":"SEGURE SEU QUADRADO","GET OUT":"SAIA","NEXT SQUARE":"PRÓXIMO QUADRADO","Orbs grabbed: ":"Orbes pegas: ",": your circle missed your square":": seu círculo errou o seu quadrado"," (if it was the safe one, nobody will find it)":" (se era o seguro, ninguém vai achar)","STEP IN":"ENTRE","STAY OUT":"FIQUE FORA","Click to capture the mouse (or drag to look)":"Clique para prender o mouse (ou arraste para olhar)","Restart":"Reiniciar","Start":"Começar","North (Ludra) is up · green: your 2 squares, then your orb (north or east) · blue: the other center player":"Norte (Ludra) em cima · verde: seus 2 quadrados, depois sua orbe (norte ou leste) · azul: o outro jogador do centro","North (Ludra) is up · green: your squares in order · blue: your partner":"Norte (Ludra) em cima · verde: seus quadrados em ordem · azul: seu parceiro","you":"você"};
+const PT_HTML = {"Ludra's Trial":"Julgamento da Ludra","STAMINA":"STAMINA","Ludra Raid Training":"Treino de Raid da Ludra","Sanctuary raid · pick a mechanic to practice":"Raid Santuário · escolha uma mecânica para treinar","by":"por","[Siel] · South America":"[Siel] · América do Sul","Resume":"Continuar","Zikel":"Zikel","Orange lines · laser walls · hard-mode circles":"Linhas laranja · paredes de laser · círculos do modo difícil","Mode":"Modo","Normal":"Normal","Hard":"Difícil","How it works":"Como funciona","Orange line: stay out until it strikes":"Linha laranja: fique fora até ela atingir","Then step onto it before the arena detonates":"Depois, pise nela antes da arena explodir","Stand in a gap as the lasers pass":"Fique numa brecha quando os lasers passarem","Hard: leave the circle before it fills, or dodge":"Difícil: saia do círculo antes de encher, ou esquive","Bingo board":"Tabuleiro Bingo","Sweep the board with your team · find the safe square":"Varra o tabuleiro com seu time · ache o quadrado seguro","Your corner":"Seu canto","Your role":"Sua função","Outside":"Externo","Inside":"Interno","Center (orb)":"Centro (orbe)","Start":"Começar","A circle follows each player: hold your square":"Um círculo segue cada jogador: segure seu quadrado","When it turns red it stays put: move to your next square":"Quando ficar vermelho, para: vá ao seu próximo quadrado","One random square is safe: a glass box shows when found":"Um quadrado aleatório é seguro: uma caixa de vidro aparece quando é achado","Then everyone runs into it: inside you take no damage":"Depois todo mundo corre para dentro: lá dentro você não leva dano","When Ludra's Trial ends, anyone outside it dies":"Quando o Julgamento da Ludra acaba, quem está fora morre","Avoid everyone's circles · perfect dodge works at the end":"Evite os círculos de todos · esquiva perfeita funciona no fim","Center: jump into your orb (Space) before it lands":"Centro: pule na sua orbe (Espaço) antes de ela cair","Phase 1 board. Your 9 teammates are bots.":"Tabuleiro da fase 1. Seus 9 companheiros são bots.","Colors":"Cores","Ludra's blue and red orbs · split by aura, keep away from the other color":"Orbes azul e vermelha da Ludra · divida-se pela aura e fique longe da outra cor","Strategy":"Estratégia","Fixed · blue left, red right":"Fixa · azul à esquerda, vermelho à direita","Adaptive · least walking":"Adaptativa · menos caminhada","Ludra holds a blue orb (left hand) and a red one (right hand)":"A Ludra segura uma orbe azul (mão esquerda) e uma vermelha (mão direita)","Everyone gets a random aura: blue goes west, red goes east":"Todos recebem uma aura aleatória: azul vai para o oeste, vermelho para o leste","Too close to an opposite aura hurts both of you":"Perto demais de uma aura oposta fere os dois","Same colors can stand together":"Cores iguais podem ficar juntas","Timings and distances are estimates (the orbs start at 4:24 in the Spiritmaster video). Your 9 teammates are bots.":"Tempos e distâncias são estimativas (as orbes começam em 4:24 no vídeo do Spiritmaster). Seus 9 companheiros são bots.","Speed":"Velocidade","Language":"Idioma","Show callouts":"Mostrar avisos","Keep going after a mistake":"Continuar depois de um erro","Mouse sensitivity":"Sensibilidade do mouse","Controls":"Controles","Move (relative to camera)":"Mover (em relação à câmera)","Look · wheel zooms":"Olhar · roda aproxima","Dodge (uses stamina)":"Esquivar (usa stamina)","Jump":"Pular","Restart":"Reiniciar","This menu":"Este menu","Made by mtkです [Siel] · South America":"Feito por mtkです [Siel] · América do Sul","Unofficial fan-made practice tool. Not affiliated with NCSOFT.":"Ferramenta de treino não oficial, feita por fãs. Não é afiliada à NCSOFT.","Could not load the 3D library. Check your internet connection and reload.":"Não foi possível carregar a biblioteca 3D. Verifique sua conexão e recarregue."};
+const L = (s) => (LANG === 'pt' && PT_JS[s]) || s;
+function applyHtmlLang() {
+  const walk = (node) => {
+    for (const n of node.childNodes) {
+      if (n.nodeType === 3) {
+        if (n._en === undefined) n._en = n.nodeValue;
+        const pt = PT_HTML[n._en.trim()];
+        if (LANG === 'pt' && pt) n.nodeValue = n._en.match(/^\s*/)[0] + pt + n._en.match(/\s*$/)[0];
+        else n.nodeValue = n._en;
+      } else if (n.nodeType === 1 && n.tagName !== 'SCRIPT' && n.tagName !== 'STYLE') walk(n);
+    }
+  };
+  walk(document.body);
+  document.title = LANG === 'pt' ? 'Treino de Raid da Ludra' : 'Ludra Raid Training';
+  document.documentElement.lang = LANG === 'pt' ? 'pt-BR' : 'en';
+}
+
 
 // ============================================================================
 // Tuning. Everything about the mechanic lives here. Ludra is north. x = east, y = south, (0,0) = arena center, meters.
@@ -214,7 +240,7 @@ const CFG = {
       4: { outside: [[5, 5], [5, 4], [5, 3], [5, 2]], inside: [[4, 5], [4, 4], [4, 3], [4, 2]] },
     },
     // the center players cover 2 squares each, then go to the orbs (A to the north or east orb, B to south or west)
-    center: [{ name: 'Center A', path: [[2, 2], [2, 3]], orb: 0 }, { name: 'Center B', path: [[3, 3], [3, 2]], orb: 1 }],
+    center: [{ name: L('Center A'), path: [[2, 2], [2, 3]], orb: 0 }, { name: L('Center B'), path: [[3, 3], [3, 2]], orb: 1 }],
   },
   // Colors (estimates; the user described it, timings not measured yet). Ludra holds a blue orb in her left hand
   // and a red one in her right. At `mark` every player and teammate gets a random aura color (blue or red). Blue
@@ -254,8 +280,9 @@ const cv = $('c');
 const HALF = CFG.arenaSize / 2, STEP = 1 / 120;
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const keys = new Set();
-const opts = { hard: false, speed: 1, keep: false, sens: 1, callouts: true, mech: 'zikel', bCorner: 1, bRole: 'outside', colorsStrategy: 'fixed' };
+const opts = { hard: false, speed: 1, keep: false, sens: 1, callouts: true, mech: 'zikel', bCorner: 1, bRole: 'outside', colorsStrategy: 'fixed', lang: null };
 try { Object.assign(opts, JSON.parse(localStorage.zikelTrainer || '{}')); } catch {}
+LANG = opts.lang || ((navigator.language || '').toLowerCase().startsWith('pt') ? 'pt' : 'en');
 if (opts.bRole === 'melee') opts.bRole = 'outside'; else if (opts.bRole === 'ranged') opts.bRole = 'inside'; else if (opts.bRole === 'centre') opts.bRole = 'center';   // older saved settings
 const saveOpts = () => { try { localStorage.zikelTrainer = JSON.stringify(opts); } catch {} };
 const cam = { yaw: 0, pitch: CFG.camera.pitch, dist: CFG.camera.distance };
@@ -282,7 +309,7 @@ function newRun(mech) {
     const role = opts.bRole === 'center' ? 'center' : opts.bRole === 'inside' ? 'inside' : 'outside';
     for (const k of [1, 2, 3, 4]) for (const r of ['outside', 'inside']) {
       const me = r === role && k === +opts.bCorner;
-      actors.push(actor(me ? 'you' : (r === 'outside' ? 'Outside ' : 'Inside ') + k, r, me, B.paths[k][r].map(step)));
+      actors.push(actor(me ? L('you') : (r === 'outside' ? L('Outside ') : L('Inside ')) + k, r, me, B.paths[k][r].map(step)));
     }
     for (let i = 0; i < 8; i += 2) { actors[i].mate = actors[i + 1]; actors[i + 1].mate = actors[i]; }
     const d = B.orb.dist, axis = Math.random() < 0.5 ? [[0, -d], [0, d]] : [[d, 0], [-d, 0]];   // north + south or east + west
@@ -291,7 +318,7 @@ function newRun(mech) {
     B.center.forEach((c, ci) => {
       const me = role === 'center' && ci === 0, path = c.path.map(step);
       while (path.length < B.count) path.push({ xy: axis[c.orb], tile: -1 });
-      const a = actor(me ? 'you' : c.name, 'center', me, path); a.orb = c.orb; orbs[c.orb].owner = a; actors.push(a);
+      const a = actor(me ? L('you') : L(c.name), 'center', me, path); a.orb = c.orb; orbs[c.orb].owner = a; actors.push(a);
     });
     actors.forEach((a, i) => { a.z = 0; a.vz = 0; a.spot = [Math.cos(i * 0.63) * 1.1, Math.sin(i * 0.63) * 1.1]; });   // spot = where each stands in the safe square
     // the breath comes from a random vertex (1 SW, 2 NW, 3 NE, 4 SE) along the diagonal through it
@@ -309,7 +336,7 @@ function newRun(mech) {
     const me = actors.find((a) => a.me);
     S = Object.assign(baseState('bingo', [me.x, me.y], B.trialStart + B.trial + 0.8), {
       waves, actors, orbs, breaths, breath: breaths[0], trialEnd: B.trialStart + B.trial, trialDone: false, safe: Math.floor(Math.random() * B.grid * B.grid), found: null, missed: [],
-      who: role === 'center' ? 'Center (orb)' : 'Corner ' + opts.bCorner + ' ' + role });
+      who: role === 'center' ? L('Center (orb)') : L('Corner ') + opts.bCorner + ' ' + role });
     return;
   }
   const L = CFG.laser;
@@ -338,9 +365,9 @@ function newRun(mech) {
 // Frame: g = unit vector from the middle of the room toward Ludra; left = the players' left when they face g.
 // A point is (u, v): u = how far toward its color's side, v = how far toward Ludra.
 // ----------------------------------------------------------------------------
-const auraName = (c) => (c === 'blue' ? 'BLUE' : 'RED');
+const auraName = (c) => (c === 'blue' ? L('BLUE') : L('RED'));
 const COLOR_CORNERS = [{ x: 0, y: -1 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 0 }];   // N (start), W, S, E
-const compassName = (v) => (Math.abs(v.y) > Math.abs(v.x) ? (v.y < 0 ? 'NORTH' : 'SOUTH') : (v.x < 0 ? 'WEST' : 'EAST'));
+const compassName = (v) => (Math.abs(v.y) > Math.abs(v.x) ? (v.y < 0 ? L('NORTH') : L('SOUTH')) : (v.x < 0 ? L('WEST') : L('EAST')));
 const frameOf = (ci) => { const g = COLOR_CORNERS[ci], left = { x: g.y, y: -g.x }; return { ci, g, left }; };
 const sideOf = (f, color, leftColor) => (color === leftColor ? f.left : { x: -f.left.x, y: -f.left.y });
 const uvOf = (f, side, x, y) => ({ u: x * side.x + y * side.y, v: x * f.g.x + y * f.g.y });
@@ -433,7 +460,7 @@ function colorsState() {
   // colors: always 5 blue and 5 red, dealt at random across the 10 players
   const colorsDeal = Array.from({ length: spawns.length }, (_, i) => (i < spawns.length / 2 ? 'blue' : 'red'));
   for (let i = colorsDeal.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [colorsDeal[i], colorsDeal[j]] = [colorsDeal[j], colorsDeal[i]]; }
-  spawns.forEach(([x, y], i) => actors.push({ me: i === 0, role: i === 0 ? 'you' : i <= M.melee ? 'melee' : 'ranged', name: '', x, y, z: 0, vz: 0,
+  spawns.forEach(([x, y], i) => actors.push({ me: i === 0, role: i === 0 ? L('you') : i <= M.melee ? 'melee' : 'ranged', name: '', x, y, z: 0, vz: 0,
     color: colorsDeal[i], dead: null, mark: null, ticks: 0, nextTick: 0, goal: null, goalUntil: 0, wait: 0 }));
   // teammates get guild names, like the Bingo board
   const pool = GUILD.slice();
@@ -443,14 +470,14 @@ function colorsState() {
   const styles = Object.keys(BOT_STYLES);
   for (const a of npcs) { a.style = styles[Math.floor(Math.random() * styles.length)]; a.st = BOT_STYLES[a.style]; }
   const me = actors[0];
-  me.name = 'you';
+  me.name = L('you');
   // stage 1 = Ludra north. Each teleport: she vanishes, reappears at another corner after `gap`, and the team has `adjust`
   // seconds to get into place before the next one. Placeholder timings.
   const n = 3, T = M.tp, tps = [];   // always 3 stages: Ludra north, then two teleports
   for (let k = 0; k < n - 1; k++) { const vanish = T.first + k * (T.gap + T.adjust); tps.push({ vanish, reappear: vanish + T.gap, done: 0 }); }
   const lastReappear = tps.length ? tps[tps.length - 1].reappear : 0;
   const end = n === 1 ? M.end : lastReappear + T.adjust + 2;
-  return Object.assign(baseState('colors', [me.x, me.y], end + 0.8), { actors, marked: false, who: 'Aura ' + auraName(me.color),
+  return Object.assign(baseState('colors', [me.x, me.y], end + 0.8), { actors, marked: false, who: L('Aura ') + auraName(me.color),
     cornerIdx: 0, frame: frameOf(0), leftColor: 'blue', hidden: false, tps, stage: 1, stages: n });
 }
 function colorsStep(t, P, inv, A, dt) {
@@ -467,7 +494,8 @@ function colorsStep(t, P, inv, A, dt) {
     if (ev.done === 0 && t >= ev.vanish) { ev.done = 1; S.hidden = true; }
     if (ev.done === 1 && t >= ev.reappear) {
       ev.done = 2; S.hidden = false;
-      const others = [0, 1, 2, 3].filter((i) => i !== S.cornerIdx);
+      // never the opposite corner (N to S, W to E): only the two corners on her left or right
+      const others = [0, 1, 2, 3].filter((i) => i !== S.cornerIdx && i !== (S.cornerIdx + 2) % 4);
       S.cornerIdx = others[Math.floor(Math.random() * others.length)];
       S.frame = frameOf(S.cornerIdx);
       S.leftColor = colorsBestLeft(S.cornerIdx);
@@ -513,7 +541,7 @@ function colorsStep(t, P, inv, A, dt) {
         if (x.me) S.hitAt = t;   // your red flash
         if (x.ticks >= M.maxTicks) {
           x.dead = t;
-          if (x.me) { fail('Hit ' + x.ticks + ' times by the other color\'s aura: too many hits'); if (S.phase !== 'run') return; }
+          if (x.me) { fail(L('Hit ') + x.ticks + L(' times by the other color\'s aura: too many hits')); if (S.phase !== 'run') return; }
         }
       }
     }
@@ -668,7 +696,7 @@ function bingoStep(t, P, inv, A, dt) {
   const burning = t >= S.breath.start && t < S.breath.end;
   if (burning) for (const a of S.actors) if (!a.me && !a.dead && !inSafe(a.x, a.y) && inBreath(a.x, a.y)) a.dead = t;
   if (burning && !inSafe(P.x, P.y) && inBreath(P.x, P.y) && !(inv && A.breath)) {
-    fail("Ludra's breath hit you" + (S.found && S.found.wave === S.waves.length ? ' (the safe square was found on the last circle: very hard to reach in time)' : ''));
+    fail(L("Ludra's breath hit you") + (S.found && S.found.wave === S.waves.length ? L(' (the safe square was found on the last circle: very hard to reach in time)') : ''));
     if (S.phase !== 'run') return;
   }
   // orbs: anyone close enough whose reach (standing, or jumping) touches the orb grabs it; if it lands first, it's lost
@@ -678,7 +706,7 @@ function bingoStep(t, P, inv, A, dt) {
       const x = a.me ? P.x : a.x, y = a.me ? P.y : a.y, z = a.me ? P.z : a.z;
       if (Math.hypot(x - o.x, y - o.y) <= O.grabRange && orbReachable(t, z)) { o.grabbed = a.name; break; }
     }
-    if (!o.grabbed && t >= O.land) { o.landed = true; if (o.owner.me) { fail('Your orb reached the ground before you grabbed it'); if (S.phase !== 'run') return; } }
+    if (!o.grabbed && t >= O.land) { o.landed = true; if (o.owner.me) { fail(L('Your orb reached the ground before you grabbed it')); if (S.phase !== 'run') return; } }
   }
   for (let i = 0; i < S.waves.length; i++) {
     const w = S.waves[i];
@@ -696,7 +724,7 @@ function bingoStep(t, P, inv, A, dt) {
     if (inSafe(P.x, P.y)) continue;   // inside the safe square you take no damage
     for (const a of S.actors) {
       const c = a.circ[i];
-      if (!c.none && Math.hypot(P.x - c.x, P.y - c.y) < B.radius && !(inv && A.circle)) { fail('Circle ' + w.n + ': hit by ' + (a.me ? 'your own circle' : a.name + "'s circle")); if (S.phase !== 'run') return; }
+      if (!c.none && Math.hypot(P.x - c.x, P.y - c.y) < B.radius && !(inv && A.circle)) { fail(L('Circle ') + w.n + L(': hit by ') + (a.me ? L('your own circle') : a.name + L("'s circle"))); if (S.phase !== 'run') return; }
     }
   }
   if (!S.trialDone && t >= S.trialEnd) {
@@ -704,12 +732,12 @@ function bingoStep(t, P, inv, A, dt) {
     for (const a of S.actors) if (!a.me && !a.dead && !inSafe(a.x, a.y)) a.dead = t;   // the meteor: teammates outside fall
     if (!S.found) {
       const mine = S.missed.find((m) => m.tile === S.safe);
-      fail("Ludra's Trial ended and the safe square was never found" + (mine ? ': it was your square on circle ' + mine.wave + ', and your circle landed outside it' : ''));
+      fail(L("Ludra's Trial ended and the safe square was never found") + (mine ? L(': it was your square on circle ') + mine.wave + L(', and your circle landed outside it') : ''));
       if (S.phase !== 'run') return;
     }
     else if (!inSafe(P.x, P.y)) {
-      const late = S.found.wave === S.waves.length ? ' (it was found on the last circle: from far away it can\'t be reached in time)' : '';
-      fail("Ludra's Trial: the meteor hit you outside the safe square" + late); if (S.phase !== 'run') return;
+      const late = S.found.wave === S.waves.length ? L(' (it was found on the last circle: from far away it can\'t be reached in time)') : '';
+      fail(L("Ludra's Trial: the meteor hit you outside the safe square") + late); if (S.phase !== 'run') return;
     }
   }
   if (t >= S.end) finish(true);
@@ -758,7 +786,7 @@ function update(dt) {
     const dist = Math.abs((P.x - ln.cx) * ln.dy - (P.y - ln.cy) * ln.dx);
     if (!ln.struck && t >= ln.t0) {
       ln.struck = true;
-      if (dist <= CFG.stripHalfWidth && !(inv && A.strike)) { fail('Line ' + ln.n + ': standing on the orange line when it struck'); if (S.phase !== 'run') return; }
+      if (dist <= CFG.stripHalfWidth && !(inv && A.strike)) { fail(L('Line ') + ln.n + L(': standing on the orange line when it struck')); if (S.phase !== 'run') return; }
     }
     if (S.hard && !ln.circled && t >= ln.t0 + ln.cd) {
       ln.circled = true; const c0 = ln.t0 + ln.cd;
@@ -766,19 +794,19 @@ function update(dt) {
     }
     if (!ln.blasted && t >= ln.t0 + CFG.strikeToBlast) {
       ln.blasted = true;
-      if (dist > CFG.stripHalfWidth && !(inv && A.blast)) { fail('Line ' + ln.n + ': not on the line when the arena detonated'); if (S.phase !== 'run') return; }
+      if (dist > CFG.stripHalfWidth && !(inv && A.blast)) { fail(L('Line ') + ln.n + L(': not on the line when the arena detonated')); if (S.phase !== 'run') return; }
     }
   }
   for (const c of S.circles) {
     if (c.done || t < c.t1) continue;
     c.done = true;
-    if (Math.hypot(P.x - c.x, P.y - c.y) < CFG.hard.circleRadius && !(inv && A.circle)) { fail('Line ' + c.n + ': inside the orange circle when it filled'); if (S.phase !== 'run') return; }
+    if (Math.hypot(P.x - c.x, P.y - c.y) < CFG.hard.circleRadius && !(inv && A.circle)) { fail(L('Line ') + c.n + L(': inside the orange circle when it filled')); if (S.phase !== 'run') return; }
   }
   for (const s of S.sweeps) {
     if (s.hit || t < s.tSpawn || t > s.tEnd || (inv && A.laser)) continue;
     const b = beams(s, t);
     for (let i = 0; i < b.length; i += 2) if (Math.hypot(P.x - b[i], P.y - b[i + 1]) < CFG.laser.radius) {
-      s.hit = true; fail('Lasers from the ' + s.side + ' (after line ' + s.n + '): hit by a beam'); if (S.phase !== 'run') return; break;
+      s.hit = true; fail(L('Lasers from the ') + s.side + L(' (after line ') + s.n + L('): hit by a beam')); if (S.phase !== 'run') return; break;
     }
   }
   if (t >= S.end) finish(true);
@@ -842,7 +870,7 @@ const ludra = new THREE.Group();
   const wing = new THREE.BufferGeometry();
   wing.setAttribute('position', new THREE.Float32BufferAttribute([-3, 14, 0, -21, 20, 3, -10, 6, 1, 3, 14, 0, 10, 6, 1, 21, 20, 3], 3)); wing.computeVertexNormals();
   const eye = new THREE.Mesh(new THREE.SphereGeometry(0.9, 16, 12), new THREE.MeshBasicMaterial({ color: 0xff9a2e, fog: false })); eye.position.set(0, 13.5, 4.4);
-  const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(512, 128, (c, w, h) => { c.fillStyle = '#c9b0ff'; c.font = '800 84px system-ui,sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('LUDRA', w / 2, h / 2); }), transparent: true, fog: false, depthWrite: false }));
+  const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(512, 128, (c, w, h) => { c.fillStyle = '#c9b0ff'; c.font = '800 84px system-ui,sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(L('LUDRA'), w / 2, h / 2); }), transparent: true, fog: false, depthWrite: false }));
   label.scale.set(14, 3.5, 1); label.position.y = 24;
   g.add(body, new THREE.Mesh(wing, dark), eye, label); scene.add(g);
 }
@@ -1267,30 +1295,30 @@ function hud() {
   if (!S) { setText(info, ''); setText(call, '', ''); setText(sub, ''); setText(hint, ''); return; }
   const t = S.t, bingo = S.mech === 'bingo', colors = S.mech === 'colors';
   const n = bingo ? S.waves.filter((w) => t >= w.t0).length : S.lines.filter((l) => t >= l.t0 - CFG.telegraph).length;
-  const total = bingo ? S.waves.length : S.lines.length, what = bingo ? 'Circle ' : 'Line ';
-  const counter = colors ? (t < CFG.colors.mark ? 'Ludra charges the orbs' : 'Stage ' + S.stage + ' / ' + S.stages + '  ·  Hits ' + S.actors.find((a) => a.me).ticks + ' / ' + CFG.colors.maxTicks) : (n ? what + n + ' / ' + total : 'Get ready');
-  setText(info, (bingo ? 'BINGO BOARD  ·  ' + S.who : colors ? 'COLORS  ·  ' + S.who : S.hard ? 'HARD' : 'NORMAL') + '  ·  ' + counter + (opts.keep ? '  ·  Mistakes: ' + S.fails.length : ''));
-  const again = 'R or Enter to retry  ·  Esc for settings', found = bingo && S.found ? 'Safe square found by ' + S.found.by + '.\n' : '';
-  if (S.phase === 'dead') { setText(call, 'YOU DIED', 'bad'); setText(sub, S.fails.join('\n') + '\n' + again); }
+  const total = bingo ? S.waves.length : S.lines.length, what = bingo ? L('Circle ') : L('Line ');
+  const counter = colors ? (t < CFG.colors.mark ? L('Ludra charges the orbs') : L('Stage ') + S.stage + ' / ' + S.stages + L('  ·  Hits ') + S.actors.find((a) => a.me).ticks + ' / ' + CFG.colors.maxTicks) : (n ? what + n + ' / ' + total : L('Get ready'));
+  setText(info, (bingo ? L('BINGO BOARD  ·  ') + S.who : colors ? L('COLORS  ·  ') + S.who : S.hard ? L('HARD') : L('NORMAL')) + '  ·  ' + counter + (opts.keep ? L('  ·  Mistakes: ') + S.fails.length : ''));
+  const again = L('R or Enter to retry  ·  Esc for settings'), found = bingo && S.found ? L('Safe square found by ') + S.found.by + '.\n' : '';
+  if (S.phase === 'dead') { setText(call, L('YOU DIED'), 'bad'); setText(sub, S.fails.join('\n') + '\n' + again); }
   else if (S.phase === 'clear') {
-    const missNote = bingo && S.missed.length ? 'Your circle missed your square on circle ' + S.missed.map((m) => m.wave).join(', ') + ". It wasn't the safe square, so it didn't cost the team this time.\n" : 'No mistakes.\n';
-    setText(call, 'CLEARED', 'ok'); setText(sub, found + missNote + again);
+    const missNote = bingo && S.missed.length ? L('Your circle missed your square on circle ') + S.missed.map((m) => m.wave).join(', ') + L(". It wasn't the safe square, so it didn't cost the team this time.\n") : L('No mistakes.\n');
+    setText(call, L('CLEARED'), 'ok'); setText(sub, found + missNote + again);
   }
-  else if (S.phase === 'done') { setText(call, S.fails.length + (S.fails.length > 1 ? ' MISTAKES' : ' MISTAKE'), 'bad'); setText(sub, S.fails.join('\n') + '\n' + again); }
+  else if (S.phase === 'done') { setText(call, S.fails.length + (S.fails.length > 1 ? L(' MISTAKES') : L(' MISTAKE')), 'bad'); setText(sub, S.fails.join('\n') + '\n' + again); }
   else if (colors) {
     let main = '', cls = '';
     const me = S.actors.find((a) => a.me), P = S.p, lines = [];
-    if (t < CFG.colors.mark) { main = opts.callouts ? 'LUDRA CHARGES THE ORBS' : ''; cls = 'out'; lines.push('Blue orb in her left hand · red in her right'); }
+    if (t < CFG.colors.mark) { main = opts.callouts ? L('LUDRA CHARGES THE ORBS') : ''; cls = 'out'; lines.push(L('Blue orb in her left hand · red in her right')); }
     else if (!me.dead && opts.callouts) {
       const R = CFG.colors.radius, near = S.actors.some((b) => b !== me && !b.dead && b.color !== me.color && Math.hypot(b.x - P.x, b.y - P.y) < R + 1.5);
       const side = compassName(colorsSide(me.color));
-      if (S.hidden) { main = 'LUDRA IS TELEPORTING'; cls = 'out'; }
-      else if (near) { main = 'TOO CLOSE: MOVE AWAY FROM THE ' + (me.color === 'blue' ? 'RED' : 'BLUE') + ' AURAS'; cls = 'bad'; }
-      else if (!colorsInArea(me, P.x, P.y)) { main = 'YOU ARE ' + auraName(me.color) + ': GO ' + side; cls = me.color === 'blue' ? 'in' : 'bad'; }
-      else { main = 'STAY ON YOUR SIDE (' + side + ')'; cls = 'ok'; }
-      lines.push('Your aura: ' + auraName(me.color) + ' · keep away from the other color');
+      if (S.hidden) { main = L('LUDRA IS TELEPORTING'); cls = 'out'; }
+      else if (near) { main = L('TOO CLOSE: MOVE AWAY FROM THE ') + (me.color === 'blue' ? L('RED') : L('BLUE')) + L(' AURAS'); cls = 'bad'; }
+      else if (!colorsInArea(me, P.x, P.y)) { main = L('YOU ARE ') + auraName(me.color) + L(': GO ') + side; cls = me.color === 'blue' ? 'in' : 'bad'; }
+      else { main = L('STAY ON YOUR SIDE (') + side + ')'; cls = 'ok'; }
+      lines.push(L('Your aura: ') + auraName(me.color) + L(' · keep away from the other color'));
     }
-    else if (me.dead) { lines.push('Your aura: ' + auraName(me.color)); }
+    else if (me.dead) { lines.push(L('Your aura: ') + auraName(me.color)); }
     setText(call, main, cls); setText(sub, lines.join('\n'));
   }
   else if (opts.callouts && bingo) {
@@ -1302,49 +1330,49 @@ function hud() {
     const lines = [];
     const sqTarget = !S.found && ks < S.waves.length && me.path[ks].tile >= 0 ? me.path[ks].xy : null;
     const breathNow = breathWindow(t) && !inside, coming = t < S.breath.start;
-    if (breathWindow(t)) lines.push('Breath from the ' + ['', 'south-west', 'north-west', 'north-east', 'south-east'][S.breath.v] + ' corner' + (inside ? ": you're safe in here" : ''));
+    if (breathWindow(t)) lines.push(L('Breath from the ') + ['', L('south-west'), L('north-west'), L('north-east'), L('south-east')][S.breath.v] + L(' corner') + (inside ? L(": you're safe in here") : ''));
     const onOrb = !!myOrb && !myOrb.grabbed && !myOrb.landed, safeC = sqXY(Math.floor(S.safe / B.grid), S.safe % B.grid);
     // found, and you can be inside before the breath starts: just go
     const beatIt = !!S.found && !inside && !onOrb && (breathNow || breathSoon(t)) && coming
       && Math.hypot(safeC[0] - S.p.x, safeC[1] - S.p.y) / CFG.player.speed < S.breath.start - t - 0.15;
     if (beatIt) {
-      main = 'BREATH: RUN IN NOW'; cls = 'in'; lines.push('You can make it before the breath starts');
+      main = L('BREATH: RUN IN NOW'); cls = 'in'; lines.push(L('You can make it before the breath starts'));
     } else if (breathNow && inBreath(S.p.x, S.p.y)) {
-      main = !coming ? 'BREATH: GET OUT OF IT' : S.found ? 'BREATH: STEP OUT OF THE ORANGE' : 'BREATH: GO TO THE FAR CORNER'; cls = 'bad';
+      main = !coming ? L('BREATH: GET OUT OF IT') : S.found ? L('BREATH: STEP OUT OF THE ORANGE') : L('BREATH: GO TO THE FAR CORNER'); cls = 'bad';
     } else if (breathNow && sqTarget && inBreath(sqTarget[0], sqTarget[1])) {
-      main = 'BREATH: HOLD THE FAR CORNER'; cls = 'out';
+      main = L('BREATH: HOLD THE FAR CORNER'); cls = 'out';
     } else if (breathNow && S.found && !(myOrb && !myOrb.grabbed && !myOrb.landed) && breathOnPath(S.p.x, S.p.y, ...sqXY(Math.floor(S.safe / B.grid), S.safe % B.grid))) {
-      main = "BREATH: DON'T CROSS IT YET"; cls = 'out'; lines.push('Go to the safe square once the breath ends');
+      main = L("BREATH: DON'T CROSS IT YET"); cls = 'out'; lines.push(L('Go to the safe square once the breath ends'));
     } else if (breathSoon(t) && S.found && !inside && !(myOrb && !myOrb.grabbed && !myOrb.landed)) {
-      main = "BREATH SOON: DON'T CUT THROUGH THE MIDDLE"; cls = 'out';
+      main = L("BREATH SOON: DON'T CUT THROUGH THE MIDDLE"); cls = 'out';
     } else if (myOrb && !myOrb.grabbed && !myOrb.landed && (ks >= 2 || S.found)) {
-      if (inMyCircle) { main = 'GET OUT OF YOUR CIRCLE'; cls = 'bad'; }
-      else if (t < S.waves[2].tSnap) { main = 'DROP YOUR CIRCLE BESIDE THE ORB'; cls = 'out'; }
-      else if (!orbReachable(t, CFG.jump.height)) { main = 'WAIT: ORB TOO HIGH'; cls = 'out'; }
-      else { main = 'JUMP INTO THE ORB (SPACE)'; cls = 'in'; }
+      if (inMyCircle) { main = L('GET OUT OF YOUR CIRCLE'); cls = 'bad'; }
+      else if (t < S.waves[2].tSnap) { main = L('DROP YOUR CIRCLE BESIDE THE ORB'); cls = 'out'; }
+      else if (!orbReachable(t, CFG.jump.height)) { main = L('WAIT: ORB TOO HIGH'); cls = 'out'; }
+      else { main = L('JUMP INTO THE ORB (SPACE)'); cls = 'in'; }
     } else if (S.found) {
       const live = liveCircles(t), sx = sqXY(Math.floor(S.safe / B.grid), S.safe % B.grid);
       const redOnPath = !inside && [0.25, 0.5, 0.75, 1].some((k) => { const x = S.p.x + (sx[0] - S.p.x) * k, y = S.p.y + (sx[1] - S.p.y) * k; return tileAt(x, y) !== S.safe && inCircles(live, x, y); });
       const falling = t >= S.trialEnd - B.meteor.lead && t < S.trialEnd;
-      if (!inside && inCircles(live, S.p.x, S.p.y)) { main = 'GET OUT OF THE RED CIRCLE'; cls = 'bad'; }
-      else if (!inside && falling) { main = 'METEOR: GET IN THE SAFE SQUARE'; cls = 'bad'; }
-      else { main = inside ? 'SAFE: STAY INSIDE' : 'RUN TO THE SAFE SQUARE'; cls = inside ? 'ok' : 'in'; }
-      if (falling) lines.push('Meteor incoming: it kills everyone outside the safe square');
-      if (redOnPath) lines.push("Red circles on the way: go around or wait for them to pop");
-    } else if (w) { main = held ? 'HOLD YOUR SQUARE' : last ? 'GET OUT' : 'NEXT SQUARE'; cls = held ? 'out' : 'bad'; }
-    if (S.found) lines.unshift('Safe square found by ' + S.found.by);
-    if (t >= B.orb.mark) lines.push('Orbs grabbed: ' + S.orbs.filter((o) => o.grabbed).length + ' / 2');
+      if (!inside && inCircles(live, S.p.x, S.p.y)) { main = L('GET OUT OF THE RED CIRCLE'); cls = 'bad'; }
+      else if (!inside && falling) { main = L('METEOR: GET IN THE SAFE SQUARE'); cls = 'bad'; }
+      else { main = inside ? L('SAFE: STAY INSIDE') : L('RUN TO THE SAFE SQUARE'); cls = inside ? 'ok' : 'in'; }
+      if (falling) lines.push(L('Meteor incoming: it kills everyone outside the safe square'));
+      if (redOnPath) lines.push(L("Red circles on the way: go around or wait for them to pop"));
+    } else if (w) { main = held ? L('HOLD YOUR SQUARE') : last ? L('GET OUT') : L('NEXT SQUARE'); cls = held ? 'out' : 'bad'; }
+    if (S.found) lines.unshift(L('Safe square found by ') + S.found.by);
+    if (t >= B.orb.mark) lines.push(L('Orbs grabbed: ') + S.orbs.filter((o) => o.grabbed).length + ' / 2');
     const lastMiss = S.missed[S.missed.length - 1];
-    if (lastMiss && t - lastMiss.t < 3) lines.push('Circle ' + lastMiss.wave + ': your circle missed your square' + (S.found ? '' : ' (if it was the safe one, nobody will find it)'));
+    if (lastMiss && t - lastMiss.t < 3) lines.push(L('Circle ') + lastMiss.wave + L(': your circle missed your square') + (S.found ? '' : L(' (if it was the safe one, nobody will find it)')));
     setText(call, main, cls); setText(sub, lines.join('\n'));
   }
   else if (opts.callouts) {
     let main = '', cls = '';
-    for (const l of S.lines) { const e = t - l.t0; if (e >= 0 && e < CFG.strikeToBlast) { main = 'STEP IN'; cls = 'in'; } else if (!main && e >= -CFG.telegraph && e < 0) { main = 'STAY OUT'; cls = 'out'; } }
-    const sw = S.sweeps.filter((s) => t >= s.tSpawn && t <= s.tEnd).map((s) => 'Lasers from the ' + s.side);
+    for (const l of S.lines) { const e = t - l.t0; if (e >= 0 && e < CFG.strikeToBlast) { main = L('STEP IN'); cls = 'in'; } else if (!main && e >= -CFG.telegraph && e < 0) { main = L('STAY OUT'); cls = 'out'; } }
+    const sw = S.sweeps.filter((s) => t >= s.tSpawn && t <= s.tEnd).map((s) => L('Lasers from the ') + s.side);
     setText(call, main, cls); setText(sub, sw.join('\n'));
   } else { setText(call, '', ''); setText(sub, ''); }
-  setText(hint, !menuOpen && !document.pointerLockElement ? 'Click to capture the mouse (or drag to look)' : '');
+  setText(hint, !menuOpen && !document.pointerLockElement ? L('Click to capture the mouse (or drag to look)') : '');
   const can = S.stamina >= CFG.dodge.cost, w = Math.round(S.stamina / CFG.dodge.stamina * 100) + '%';
   if (dodge._w !== w) { dodge._w = w; $('dodgeBar').style.width = w; }
   if (dodge._c !== can) { dodge._c = can; dodge.className = can ? 'ready' : ''; }
@@ -1398,17 +1426,18 @@ function syncUI() {
   $('keep').checked = opts.keep; $('callouts').checked = opts.callouts; $('sens').value = opts.sens;
   const running = S && S.phase === 'run';
   $('resumeRow').style.display = running ? '' : 'none';
-  $('go').textContent = S && S.mech === 'zikel' ? 'Restart' : 'Start';
-  $('goBingo').textContent = S && S.mech === 'bingo' ? 'Restart' : 'Start';
-  $('goColors').textContent = S && S.mech === 'colors' ? 'Restart' : 'Start';
+  $('go').textContent = S && S.mech === 'zikel' ? L('Restart') : L('Start');
+  $('goBingo').textContent = S && S.mech === 'bingo' ? L('Restart') : L('Start');
+  $('goColors').textContent = S && S.mech === 'colors' ? L('Restart') : L('Start');
   for (const b of $('cStrategy').children) b.classList.toggle('on', b.dataset.v === opts.colorsStrategy);
+  for (const b of $('lang').children) b.classList.toggle('on', b.dataset.v === LANG);
   for (const b of $('bCorner').children) b.classList.toggle('on', +b.dataset.v === +opts.bCorner);
   for (const b of $('bRole').children) b.classList.toggle('on', b.dataset.v === opts.bRole);
   const center = opts.bRole === 'center', P2 = CFG.bingo.paths[opts.bCorner];
   $('bCorner').classList.toggle('dim', center);
   const mine = center ? CFG.bingo.center[0].path : P2[opts.bRole], mate = center ? CFG.bingo.center[1].path : P2[opts.bRole === 'outside' ? 'inside' : 'outside'];
-  setText($('bMiniCap'), center ? 'North (Ludra) is up · green: your 2 squares, then your orb (north or east) · blue: the other center player'
-    : 'North (Ludra) is up · green: your squares in order · blue: your partner');
+  setText($('bMiniCap'), center ? L('North (Ludra) is up · green: your 2 squares, then your orb (north or east) · blue: the other center player')
+    : L('North (Ludra) is up · green: your squares in order · blue: your partner'));
   let h = '';
   for (let r = 0; r < CFG.bingo.grid; r++) for (let c = 0; c < CFG.bingo.grid; c++) {
     const mi = mine.findIndex((q) => q[0] === r && q[1] === c), pi = mate.findIndex((q) => q[0] === r && q[1] === c);
@@ -1427,11 +1456,13 @@ $('callouts').addEventListener('change', (e) => { opts.callouts = e.target.check
 $('go').addEventListener('click', () => start('zikel'));
 $('goBingo').addEventListener('click', () => start('bingo'));
 $('goColors').addEventListener('click', () => start('colors'));
+$('lang').addEventListener('click', (e) => { if (e.target.dataset.v) { LANG = opts.lang = e.target.dataset.v; saveOpts(); applyHtmlLang(); syncUI(); } });
 $('cStrategy').addEventListener('click', (e) => { if (e.target.dataset.v) { opts.colorsStrategy = e.target.dataset.v; saveOpts(); syncUI(); } });
 $('resume').addEventListener('click', closeMenu);
 
 window.zikel = { CFG, opts, cam, STEP, newRun, update, sync, hud, get S() { return S; }, render: () => { sync(); hud(); renderer.render(scene, camera); } };
 $('dodge').style.setProperty('--seg', (CFG.dodge.cost / CFG.dodge.stamina * 100) + '%');
+applyHtmlLang();
 syncUI(); resize(); requestAnimationFrame(frame);
 </script>
 </body>
